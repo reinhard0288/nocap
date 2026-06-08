@@ -397,6 +397,211 @@ html, body {
 .q-card { transition:opacity 0.15s, transform 0.15s; }
 .q-card.hide { opacity:0; transform:translateY(12px) scale(0.98); }
 
+/* ======================== SPIN BOTTLE ======================== */
+#spin {
+  align-items:center;
+  justify-content:space-between;
+  padding: 0;
+}
+
+.spin-top {
+  padding: 20px 20px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+}
+
+.spin-area {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:24px;
+  padding: 20px;
+  position:relative;
+}
+
+.players-circle {
+  position:relative;
+  width: min(320px, 80vw);
+  height: min(320px, 80vw);
+}
+
+.player-dot {
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  transform-origin: center;
+  transition: all 0.3s;
+}
+
+.player-dot .dot-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius:50%;
+  background: var(--card);
+  border: 2px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:600;
+  color: var(--text);
+  transition: all 0.3s;
+}
+
+.player-dot.winner .dot-avatar {
+  border-color: var(--accent);
+  background: rgba(232,255,71,0.15);
+  transform: scale(1.2);
+  box-shadow: 0 0 20px rgba(232,255,71,0.4);
+}
+
+.player-dot .dot-name {
+  font-size:11px;
+  color: var(--muted);
+  font-weight:600;
+  text-align:center;
+  max-width:60px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  transition: color 0.3s;
+}
+
+.player-dot.winner .dot-name { color: var(--accent); }
+
+/* BOTTLE SVG */
+.bottle-wrap {
+  position:absolute;
+  top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  width:80px; height:80px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.bottle-svg {
+  width:70px;
+  height:70px;
+  transform-origin: center;
+  filter: drop-shadow(0 0 12px rgba(232,255,71,0.3));
+}
+
+.spin-btn {
+  width:100%;
+  max-width:320px;
+  padding:16px;
+  background: var(--accent);
+  color:#000;
+  border:none;
+  border-radius:var(--r);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;
+  letter-spacing:0.08em;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.spin-btn:hover { background:#fff; }
+.spin-btn:disabled { background:var(--surface); color:var(--muted); cursor:not-allowed; }
+
+.spin-bottom {
+  padding:16px 20px 32px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  width:100%;
+}
+
+/* WINNER OVERLAY */
+.winner-overlay {
+  display:none;
+  position:fixed; inset:0; z-index:50;
+  background: rgba(0,0,0,0.92);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  padding:32px;
+  text-align:center;
+}
+.winner-overlay.show { display:flex; }
+
+.winner-name {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(48px,15vw,80px);
+  color:var(--accent);
+  line-height:1;
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.winner-label {
+  font-size:16px;
+  color:var(--muted);
+}
+
+.winner-q-card {
+  background:var(--card);
+  border:1px solid var(--border-strong);
+  border-radius:20px;
+  padding:24px 20px;
+  max-width:340px;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+  text-align:center;
+  animation: slideUp 0.4s 0.1s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(24px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.winner-q-type {
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  padding:3px 10px;
+  border-radius:99px;
+  background:rgba(255,255,255,0.06);
+}
+
+.winner-q-text {
+  font-size:18px;
+  font-weight:600;
+  color:var(--text);
+  line-height:1.4;
+}
+
+.winner-q-hint {
+  font-size:13px;
+  color:var(--muted);
+  font-style:italic;
+}
+
+.winner-next-btn {
+  width:100%;
+  max-width:340px;
+  padding:14px;
+  background:var(--accent);
+  color:#000;
+  border:none;
+  border-radius:var(--r);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;
+  cursor:pointer;
+}
+
 /* ======================== END SCREEN ======================== */
 #endscreen {
   align-items:center;
@@ -617,6 +822,7 @@ html, body {
     </div>
 
     <button class="cta-btn" id="startBtn" disabled onclick="startGame()">START THE CHAOS</button>
+    <button class="cta-btn" id="spinStartBtn" disabled onclick="startSpin()" style="background:transparent;border:2px solid var(--accent);color:var(--accent);margin-top:-20px;">🍾 SPIN THE BOTTLE MODE</button>
 
   </div>
 </div>
@@ -681,6 +887,51 @@ html, body {
     <button class="cta-btn" onclick="playAgain()">PLAY AGAIN</button>
     <button class="skip-btn" onclick="goHome()" style="width:100%;border-radius:var(--r);">change settings</button>
   </div>
+</div>
+
+<!-- SPIN THE BOTTLE SCREEN -->
+<div class="screen" id="spin">
+  <div class="spin-top">
+    <button class="quit-btn" onclick="quitSpin()">✕ quit</button>
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);" id="spinRoundLabel">round 1</div>
+  </div>
+
+  <div class="spin-area">
+    <div class="players-circle" id="playersCircle">
+      <!-- players rendered by JS -->
+      <div class="bottle-wrap">
+        <svg class="bottle-svg" id="bottleSvg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- bottle body -->
+          <ellipse cx="40" cy="54" rx="14" ry="18" fill="#e8ff47" opacity="0.9"/>
+          <!-- bottle neck -->
+          <rect x="35" y="28" width="10" height="18" rx="4" fill="#e8ff47" opacity="0.9"/>
+          <!-- bottle top -->
+          <rect x="37" y="22" width="6" height="8" rx="2" fill="#b8cc00"/>
+          <!-- shine -->
+          <ellipse cx="34" cy="48" rx="3" ry="6" fill="white" opacity="0.2"/>
+          <!-- arrow tip -->
+          <polygon points="40,8 46,22 34,22" fill="#ff4444"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="spin-bottom">
+    <button class="spin-btn" id="spinBtn" onclick="spinBottle()">SPIN THE BOTTLE 🍾</button>
+    <button class="skip-btn" onclick="quitSpin()" style="width:100%;border-radius:var(--r);">back to home</button>
+  </div>
+</div>
+
+<!-- WINNER OVERLAY -->
+<div class="winner-overlay" id="winnerOverlay">
+  <div class="winner-label">the bottle picked</div>
+  <div class="winner-name" id="winnerName">Rahul</div>
+  <div class="winner-q-card">
+    <div class="winner-q-type" id="winnerQType" style="color:var(--accent)">truth</div>
+    <div class="winner-q-text" id="winnerQText">Loading...</div>
+    <div class="winner-q-hint" id="winnerQHint"></div>
+  </div>
+  <button class="winner-next-btn" onclick="closeWinner()">SPIN AGAIN →</button>
 </div>
 
 <!-- 18+ LOCK MODAL -->
@@ -853,6 +1104,8 @@ function renderPlayers() {
     `).join('');
   }
   document.getElementById('startBtn').disabled = players.length < 2;
+  const spinBtn = document.getElementById('spinStartBtn');
+  if (spinBtn) spinBtn.disabled = players.length < 2;
 }
 
 // ---- GAME ----
@@ -1003,6 +1256,126 @@ window.addEventListener('load', () => {
     }, 2000);
   }
 });
+
+// ---- SPIN THE BOTTLE ----
+let bottleAngle = 0;
+let spinRound = 1;
+let spinQueue = [];
+let spinning = false;
+
+function startSpin() {
+  spinRound = 1;
+  spinQueue = buildQueue();
+  renderCircle();
+  showScreen('spin');
+  document.getElementById('spinRoundLabel').textContent = 'round 1';
+}
+
+function renderCircle() {
+  const circle = document.getElementById('playersCircle');
+  const size = circle.offsetWidth || 300;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - 36;
+
+  // Remove old dots
+  circle.querySelectorAll('.player-dot').forEach(d => d.remove());
+
+  players.forEach((name, i) => {
+    const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+
+    const dot = document.createElement('div');
+    dot.className = 'player-dot';
+    dot.id = `pdot-${i}`;
+    dot.style.left = `${x}px`;
+    dot.style.top = `${y}px`;
+    dot.style.transform = 'translate(-50%,-50%)';
+    dot.innerHTML = `
+      <div class="dot-avatar">${name[0].toUpperCase()}</div>
+      <div class="dot-name">${name}</div>
+    `;
+    circle.appendChild(dot);
+  });
+}
+
+function spinBottle() {
+  if (spinning) return;
+  spinning = true;
+  document.getElementById('spinBtn').disabled = true;
+
+  // Pick random winner
+  const winnerIdx = Math.floor(Math.random() * players.length);
+  const size = document.getElementById('playersCircle').offsetWidth || 300;
+  const r = size / 2 - 36;
+
+  // Calculate target angle to point at winner
+  const targetAngleForPlayer = (winnerIdx / players.length) * 360 - 90;
+  const extraSpins = (5 + Math.floor(Math.random() * 4)) * 360;
+  const finalAngle = bottleAngle + extraSpins + (targetAngleForPlayer - (bottleAngle % 360));
+
+  // Animate bottle
+  const bottle = document.getElementById('bottleSvg');
+  const duration = 3000 + Math.random() * 1000;
+  const start = performance.now();
+  const startAngle = bottleAngle;
+
+  function animate(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = startAngle + (finalAngle - startAngle) * eased;
+    bottle.style.transform = `rotate(${current}deg)`;
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      bottleAngle = finalAngle;
+      spinning = false;
+      document.getElementById('spinBtn').disabled = false;
+
+      // Show winner
+      setTimeout(() => showWinner(winnerIdx), 300);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function showWinner(idx) {
+  const name = players[idx];
+
+  // Highlight winner dot
+  document.querySelectorAll('.player-dot').forEach(d => d.classList.remove('winner'));
+  const dot = document.getElementById(`pdot-${idx}`);
+  if (dot) dot.classList.add('winner');
+
+  // Get question
+  const q = spinQueue[spinRound % spinQueue.length];
+  const color = TYPE_COLORS[q.type] || '#e8ff47';
+
+  document.getElementById('winnerName').textContent = name;
+  document.getElementById('winnerQType').textContent = TYPE_LABELS[q.type] || q.type;
+  document.getElementById('winnerQType').style.color = color;
+  document.getElementById('winnerQText').textContent = q.q;
+  document.getElementById('winnerQHint').textContent = q.hint || '';
+
+  document.getElementById('winnerOverlay').classList.add('show');
+  spinRound++;
+  document.getElementById('spinRoundLabel').textContent = `round ${spinRound}`;
+}
+
+function closeWinner() {
+  document.getElementById('winnerOverlay').classList.remove('show');
+  document.querySelectorAll('.player-dot').forEach(d => d.classList.remove('winner'));
+}
+
+function quitSpin() {
+  document.getElementById('winnerOverlay').classList.remove('show');
+  goHome();
+}
 
 // ---- TOAST ----
 function showToast(msg) {
