@@ -8,6 +8,12 @@
 <meta property="og:title" content="No Cap — Squad Games. Zero Filter.">
 <meta property="og:description" content="Play with your squad. No login. No BS. Just chaos.">
 <meta name="theme-color" content="#0d0d0d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="No Cap">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap" rel="stylesheet">
 <style>
@@ -698,6 +704,19 @@ html, body {
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- INSTALL BANNER -->
+<div id="installBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:300; padding:16px; background:var(--card); border-top:1px solid var(--border-strong);">
+  <div style="display:flex; align-items:center; gap:14px; max-width:440px; margin:0 auto;">
+    <div style="font-size:32px;">🎮</div>
+    <div style="flex:1;">
+      <div style="font-size:14px; font-weight:600; color:var(--text);">Add No Cap to home screen</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:2px;">play anytime, works offline</div>
+    </div>
+    <button onclick="installApp()" style="background:var(--accent); color:#000; border:none; border-radius:99px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;">Install</button>
+    <button onclick="dismissInstall()" style="background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; padding:0 4px;">×</button>
+  </div>
+</div>
+
 <script>
 const QUESTIONS = {
   truth:[
@@ -935,6 +954,44 @@ function handlePay() {
   // Once Razorpay is set up, replace above with:
   // var rzp = new Razorpay({ key:'YOUR_KEY', amount:4900, currency:'INR', ... })
   // rzp.open();
+}
+
+// ---- PWA ----
+let deferredPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => {
+    document.getElementById('installBanner').style.display = 'block';
+  }, 3000);
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').style.display = 'none';
+  showToast("No Cap installed! find it on your home screen 🎮");
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').style.display = 'none';
+    });
+  } else {
+    showToast("tap Share → Add to Home Screen on iPhone");
+  }
+}
+
+function dismissInstall() {
+  document.getElementById('installBanner').style.display = 'none';
 }
 
 // ---- TOAST ----
