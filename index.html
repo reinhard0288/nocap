@@ -968,9 +968,6 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  setTimeout(() => {
-    document.getElementById('installBanner').style.display = 'block';
-  }, 3000);
 });
 
 window.addEventListener('appinstalled', () => {
@@ -986,13 +983,26 @@ function installApp() {
       document.getElementById('installBanner').style.display = 'none';
     });
   } else {
-    showToast("tap Share → Add to Home Screen on iPhone");
+    showToast("tap Share → Add to Home Screen on iPhone 📲");
   }
 }
 
 function dismissInstall() {
   document.getElementById('installBanner').style.display = 'none';
+  localStorage.setItem('installDismissed', '1');
 }
+
+// Show banner immediately on mobile if not dismissed
+window.addEventListener('load', () => {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const dismissed = localStorage.getItem('installDismissed');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isMobile && !dismissed && !isStandalone) {
+    setTimeout(() => {
+      document.getElementById('installBanner').style.display = 'block';
+    }, 2000);
+  }
+});
 
 // ---- TOAST ----
 function showToast(msg) {
