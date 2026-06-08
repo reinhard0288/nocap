@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>No Cap — Squad Games. Zero Filter.</title>
+<meta name="description" content="The wildest party game for you and your squad. Truth or Dare, Never Have I Ever, Desi Edition and more.">
+<meta property="og:title" content="No Cap — Squad Games. Zero Filter.">
+<meta property="og:description" content="Play with your squad. No login. No BS. Just chaos.">
+<meta name="theme-color" content="#0d0d0d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --card: #1c1c1c;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.15);
+  --text: #f0f0f0;
+  --muted: #666;
+  --accent: #e8ff47;
+  --accent-dark: #b8cc00;
+  --red: #ff4444;
+  --orange: #ff8c42;
+  --blue: #4488ff;
+  --pink: #ff44aa;
+  --purple: #aa44ff;
+  --teal: #44ffcc;
+  --r: 16px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Instrument Sans', sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* SCREENS */
+.screen { display:none; min-height:100dvh; flex-direction:column; }
+.screen.active { display:flex; }
+
+/* ======================== HOME ======================== */
+#home {
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-noise {
+  position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.4;
+}
+
+.home-inner {
+  position:relative; z-index:1;
+  padding: 48px 24px 32px;
+  display:flex; flex-direction:column; gap:32px;
+  flex:1;
+}
+
+.logo-block { text-align:center; }
+
+.logo-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.logo-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 22vw, 120px);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  text-shadow: 0 0 60px rgba(232,255,71,0.2);
+}
+
+.logo-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* CATEGORY PILLS */
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.cat-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cat-btn::after {
+  content:'';
+  position:absolute; inset:0;
+  background: var(--cat-color, var(--accent));
+  opacity:0;
+  transition: opacity 0.2s;
+  border-radius: var(--r);
+}
+
+.cat-btn.on { border-color: var(--cat-color, var(--accent)); }
+.cat-btn.on::after { opacity:0.08; }
+
+.cat-icon { font-size:26px; display:block; margin-bottom:8px; position:relative; z-index:1; }
+.cat-name { font-size:13px; font-weight:600; color:var(--text); position:relative; z-index:1; }
+.cat-desc { font-size:11px; color:var(--muted); margin-top:3px; position:relative; z-index:1; }
+
+.cat-lock {
+  position:absolute; top:10px; right:10px; z-index:2;
+  font-size:10px; font-weight:600;
+  background: var(--orange);
+  color:#000;
+  padding:2px 7px;
+  border-radius:99px;
+}
+
+/* PLAYERS */
+.players-section { display:flex; flex-direction:column; gap:10px; }
+
+.player-tags {
+  display:flex; flex-wrap:wrap; gap:8px;
+  min-height:36px;
+}
+
+.player-tag {
+  display:flex; align-items:center; gap:6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius:99px;
+  padding: 6px 12px;
+  font-size:13px;
+  animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes popIn {
+  from { opacity:0; transform:scale(0.7); }
+  to { opacity:1; transform:scale(1); }
+}
+
+.player-tag button {
+  background:none; border:none; color:var(--muted);
+  cursor:pointer; font-size:16px; line-height:1;
+  padding:0; display:flex; align-items:center;
+}
+
+.add-row {
+  display:flex; gap:8px;
+}
+
+.add-row input {
+  flex:1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius:99px;
+  padding: 10px 16px;
+  color: var(--text);
+  font-size:14px;
+  font-family: 'Instrument Sans', sans-serif;
+  outline:none;
+  transition: border-color 0.2s;
+}
+
+.add-row input:focus { border-color: var(--border-strong); }
+.add-row input::placeholder { color: var(--muted); }
+
+.add-row button {
+  width:42px; height:42px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius:50%;
+  color: var(--text);
+  font-size:22px;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition: background 0.2s;
+}
+
+.add-row button:hover { background: var(--card); }
+
+.cta-btn {
+  width:100%;
+  padding: 16px;
+  background: var(--accent);
+  color: #000;
+  border:none;
+  border-radius: var(--r);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  cursor:pointer;
+  transition: all 0.2s;
+  margin-top:4px;
+}
+
+.cta-btn:hover { background: #fff; transform:scale(1.01); }
+.cta-btn:disabled { background: var(--surface); color: var(--muted); cursor:not-allowed; transform:none; }
+
+/* ======================== GAME ======================== */
+#game {
+  justify-content:space-between;
+  padding: 0;
+}
+
+.game-top {
+  padding: 20px 20px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.quit-btn {
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:99px;
+  padding:8px 14px;
+  color:var(--muted);
+  font-size:13px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.quit-btn:hover { color:var(--text); border-color:var(--border-strong); }
+
+.q-counter {
+  font-family:'Space Mono',monospace;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.progress-wrap {
+  padding: 14px 20px 0;
+}
+
+.progress-track {
+  width:100%;
+  height:2px;
+  background: var(--surface);
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.progress-bar {
+  height:100%;
+  background: var(--accent);
+  border-radius:99px;
+  transition: width 0.4s ease;
+}
+
+.turn-banner {
+  text-align:center;
+  padding: 20px 20px 0;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.turn-banner strong {
+  color:var(--text);
+  font-size:16px;
+}
+
+/* QUESTION CARD */
+.q-area {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.q-card {
+  width:100%;
+  max-width:440px;
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:32px 28px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.q-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background: var(--q-color, var(--accent));
+}
+
+.q-type {
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color: var(--q-color, var(--accent));
+  background: rgba(255,255,255,0.05);
+  padding:4px 12px;
+  border-radius:99px;
+}
+
+.q-text {
+  font-size:clamp(18px,5vw,24px);
+  font-weight:600;
+  line-height:1.4;
+  color:var(--text);
+}
+
+.q-hint {
+  font-size:13px;
+  color:var(--muted);
+  font-style:italic;
+}
+
+.q-emoji {
+  font-size:44px;
+}
+
+/* BOTTOM ACTIONS */
+.game-bottom {
+  padding: 16px 20px 32px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.btn-row { display:flex; gap:10px; }
+
+.skip-btn {
+  flex:1;
+  padding:14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  color:var(--muted);
+  font-size:15px;
+  cursor:pointer;
+  transition:all 0.2s;
+  font-family:'Instrument Sans',sans-serif;
+}
+.skip-btn:hover { border-color:var(--border-strong); color:var(--text); }
+
+.next-btn {
+  flex:2;
+  padding:14px;
+  background:var(--accent);
+  border:none;
+  border-radius:var(--r);
+  color:#000;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s;
+  font-family:'Instrument Sans',sans-serif;
+}
+.next-btn:hover { background:#fff; }
+
+/* CARD ANIMATION */
+.q-card { transition:opacity 0.15s, transform 0.15s; }
+.q-card.hide { opacity:0; transform:translateY(12px) scale(0.98); }
+
+/* ======================== END SCREEN ======================== */
+#endscreen {
+  align-items:center;
+  justify-content:center;
+  gap:24px;
+  padding:40px 24px;
+  text-align:center;
+}
+
+.end-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:64px;
+  color:var(--accent);
+  line-height:1;
+}
+
+.end-sub { font-size:16px; color:var(--muted); }
+
+.end-stats {
+  display:flex; gap:24px;
+  justify-content:center;
+}
+
+.end-stat {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+
+.end-stat-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:42px;
+  color:var(--text);
+  line-height:1;
+}
+
+.end-stat-label {
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+
+.share-text {
+  font-size:13px;
+  color:var(--muted);
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px 18px;
+  line-height:1.6;
+  max-width:340px;
+}
+
+.share-text strong { color:var(--text); }
+
+.end-btns { display:flex; flex-direction:column; gap:10px; width:100%; max-width:340px; }
+
+/* ======================== LOCK MODAL ======================== */
+.modal-overlay {
+  display:none;
+  position:fixed; inset:0; z-index:100;
+  background:rgba(0,0,0,0.85);
+  align-items:flex-end;
+  justify-content:center;
+  padding:20px;
+}
+.modal-overlay.open { display:flex; }
+
+.modal {
+  background:var(--card);
+  border:1px solid var(--border-strong);
+  border-radius:24px 24px 16px 16px;
+  padding:32px 28px;
+  width:100%;
+  max-width:440px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  text-align:center;
+  animation: slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);
+}
+
+@keyframes slideUp {
+  from { transform:translateY(60px); opacity:0; }
+  to { transform:translateY(0); opacity:1; }
+}
+
+.modal-icon { font-size:48px; }
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--accent); }
+.modal-desc { font-size:14px; color:var(--muted); line-height:1.6; }
+.modal-price { font-family:'Bebas Neue',sans-serif; font-size:48px; color:var(--text); }
+.modal-price span { font-size:24px; color:var(--muted); }
+
+.modal-features {
+  display:flex; flex-direction:column; gap:8px;
+  text-align:left;
+}
+
+.modal-feature {
+  display:flex; align-items:center; gap:10px;
+  font-size:13px; color:var(--muted);
+}
+
+.modal-feature::before {
+  content:'✓';
+  color:var(--accent);
+  font-weight:600;
+  min-width:16px;
+}
+
+.pay-btn {
+  width:100%;
+  padding:16px;
+  background:var(--accent);
+  color:#000;
+  border:none;
+  border-radius:var(--r);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;
+  letter-spacing:0.05em;
+  cursor:pointer;
+}
+
+.pay-note {
+  font-size:11px;
+  color:var(--muted);
+  font-family:'Space Mono',monospace;
+}
+
+.modal-close {
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-size:13px;
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+/* TOAST */
+.toast {
+  position:fixed;
+  bottom:32px;
+  left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--text);
+  color:#000;
+  padding:10px 20px;
+  border-radius:99px;
+  font-size:13px;
+  font-weight:600;
+  z-index:200;
+  transition:transform 0.3s;
+  white-space:nowrap;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+</style>
+</head>
+<body>
+
+<!-- HOME SCREEN -->
+<div class="screen active" id="home">
+  <div class="home-noise"></div>
+  <div class="home-inner">
+
+    <div class="logo-block">
+      <div class="logo-eyebrow">squad party game</div>
+      <div class="logo-title">NO<br>CAP</div>
+      <div class="logo-sub">zero filter. pure chaos.</div>
+    </div>
+
+    <div>
+      <div class="section-label">pick your vibe</div>
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-btn on" data-cat="truth" style="--cat-color:#e8ff47" onclick="toggleCat(this)">
+          <span class="cat-icon">😳</span>
+          <div class="cat-name">Truth or Dare</div>
+          <div class="cat-desc">40 rounds of chaos</div>
+        </div>
+        <div class="cat-btn" data-cat="never" style="--cat-color:#44ffcc" onclick="toggleCat(this)">
+          <span class="cat-icon">🍻</span>
+          <div class="cat-name">Never Have I Ever</div>
+          <div class="cat-desc">who's the most unhinged</div>
+        </div>
+        <div class="cat-btn" data-cat="would" style="--cat-color:#4488ff" onclick="toggleCat(this)">
+          <span class="cat-icon">🤔</span>
+          <div class="cat-name">Would You Rather</div>
+          <div class="cat-desc">impossible choices only</div>
+        </div>
+        <div class="cat-btn" data-cat="desi" style="--cat-color:#ff8c42" onclick="toggleCat(this)">
+          <span class="cat-icon">🎬</span>
+          <div class="cat-name">Desi Edition</div>
+          <div class="cat-desc">bollywood & beyond</div>
+        </div>
+        <div class="cat-btn" data-cat="hot" style="--cat-color:#ff4444" onclick="toggleCat(this)">
+          <span class="cat-icon">🌶️</span>
+          <div class="cat-name">Spicy Takes</div>
+          <div class="cat-desc">say what you actually think</div>
+        </div>
+        <div class="cat-btn" data-cat="spicy" style="--cat-color:#ff44aa" onclick="toggleCat(this, true)">
+          <span class="cat-icon">🔞</span>
+          <div class="cat-name">18+ Mode</div>
+          <div class="cat-desc">not for the faint hearted</div>
+          <div class="cat-lock">UNLOCK</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="players-section">
+      <div class="section-label">who's playing</div>
+      <div class="player-tags" id="playerTags">
+        <div style="font-size:13px;color:var(--muted);align-self:center;">add at least 2 players</div>
+      </div>
+      <div class="add-row">
+        <input type="text" id="nameInput" placeholder="player name..." maxlength="18" onkeydown="if(event.key==='Enter')addPlayer()">
+        <button onclick="addPlayer()">+</button>
+      </div>
+    </div>
+
+    <button class="cta-btn" id="startBtn" disabled onclick="startGame()">START THE CHAOS</button>
+
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="game">
+  <div class="game-top">
+    <button class="quit-btn" onclick="quitGame()">✕ quit</button>
+    <div class="q-counter" id="qCounter">1 / 20</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-bar" id="progressBar" style="width:5%"></div>
+    </div>
+  </div>
+
+  <div class="turn-banner" id="turnBanner">
+    <strong>Rahul's</strong> turn
+  </div>
+
+  <div class="q-area">
+    <div class="q-card" id="qCard">
+      <div class="q-emoji" id="qEmoji">😳</div>
+      <div class="q-type" id="qType">truth</div>
+      <div class="q-text" id="qText">Loading...</div>
+      <div class="q-hint" id="qHint"></div>
+    </div>
+  </div>
+
+  <div class="game-bottom">
+    <div class="btn-row">
+      <button class="skip-btn" onclick="nextQ(true)">skip</button>
+      <button class="next-btn" onclick="nextQ(false)">next question →</button>
+    </div>
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div class="screen" id="endscreen">
+  <div class="end-title">GG!</div>
+  <div class="end-sub">that was absolutely unhinged</div>
+  <div class="end-stats">
+    <div class="end-stat">
+      <div class="end-stat-num" id="endPlayers">4</div>
+      <div class="end-stat-label">players</div>
+    </div>
+    <div class="end-stat">
+      <div class="end-stat-num" id="endRounds">20</div>
+      <div class="end-stat-label">rounds</div>
+    </div>
+    <div class="end-stat">
+      <div class="end-stat-num" id="endSkips">3</div>
+      <div class="end-stat-label">skips</div>
+    </div>
+  </div>
+  <div class="share-text">
+    "just played <strong>No Cap</strong> with my squad and found out things i can NEVER unhear 💀<br>
+    play at nocap.vercel.app"
+  </div>
+  <div class="end-btns">
+    <button class="cta-btn" onclick="playAgain()">PLAY AGAIN</button>
+    <button class="skip-btn" onclick="goHome()" style="width:100%;border-radius:var(--r);">change settings</button>
+  </div>
+</div>
+
+<!-- 18+ LOCK MODAL -->
+<div class="modal-overlay" id="lockModal" onclick="closeLock(event)">
+  <div class="modal">
+    <div class="modal-icon">🔞</div>
+    <div class="modal-title">18+ Mode</div>
+    <div class="modal-desc">unlock the spiciest, most unfiltered questions. not for the weak.</div>
+    <div class="modal-price">₹49 <span>one time</span></div>
+    <div class="modal-features">
+      <div class="modal-feature">25+ exclusive 18+ questions</div>
+      <div class="modal-feature">new questions added every month</div>
+      <div class="modal-feature">unlock forever, no subscription</div>
+    </div>
+    <button class="pay-btn" onclick="handlePay()">UNLOCK NOW — ₹49</button>
+    <div class="pay-note">razorpay · 100% secure · one device</div>
+    <button class="modal-close" onclick="closeLockModal()">maybe later</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const QUESTIONS = {
+  truth:[
+    {type:'truth',emoji:'😳',q:"What's the most embarrassing thing you've searched on YouTube?",hint:''},
+    {type:'dare',emoji:'🎯',q:"Text your crush right now with just 'hey'. Show the screen.",hint:'no backing out.'},
+    {type:'truth',emoji:'🧠',q:"What's your most unhinged 3am thought ever?",hint:''},
+    {type:'dare',emoji:'🎭',q:"Do your best impression of someone in this room. They guess who.",hint:''},
+    {type:'truth',emoji:'📱',q:"What app would cause maximum damage if someone scrolled through it?",hint:''},
+    {type:'dare',emoji:'😂',q:"Send a voice note to your bestie saying 'we need to talk'.",hint:'wait for the panic.'},
+    {type:'truth',emoji:'💀',q:"What's the worst lie you've ever told your parents?",hint:''},
+    {type:'truth',emoji:'👀',q:"Who in this room would you swap lives with for a week?",hint:''},
+    {type:'dare',emoji:'🎤',q:"Sing the chorus of the last song you listened to. Right now.",hint:'no humming. full voice.'},
+    {type:'truth',emoji:'🤡',q:"Rate everyone in this room by their main character energy. 1-10.",hint:'be brutal.'},
+    {type:'truth',emoji:'😬',q:"What's the shadiest thing you've ever done and gotten away with?",hint:''},
+    {type:'dare',emoji:'📸',q:"Let the person on your left post any photo from your camera roll.",hint:'they pick it.'},
+    {type:'truth',emoji:'🧃',q:"Who do you have saved under a fake name in your contacts?",hint:''},
+    {type:'dare',emoji:'🤙',q:"Call someone right now and say 'I miss you' then hang up.",hint:'show the call screen.'},
+    {type:'truth',emoji:'💸',q:"What's the most money you've wasted on something absolutely stupid?",hint:''},
+  ],
+  never:[
+    {type:'never',emoji:'👻',q:"Never have I ever ghosted someone I actually liked.",hint:'raise your hand if you have.'},
+    {type:'never',emoji:'📸',q:"Never have I ever stalked someone's Instagram from 2017.",hint:''},
+    {type:'never',emoji:'😭',q:"Never have I ever cried because of a TV show character dying.",hint:''},
+    {type:'never',emoji:'🤥',q:"Never have I ever said 'I'm 5 minutes away' while still at home.",hint:''},
+    {type:'never',emoji:'💬',q:"Never have I ever read a message and intentionally left it on seen.",hint:''},
+    {type:'never',emoji:'🧠',q:"Never have I ever had a full argument with someone in my head.",hint:'and won.'},
+    {type:'never',emoji:'❤️',q:"Never have I ever liked my own post from a fake account.",hint:''},
+    {type:'never',emoji:'😬',q:"Never have I ever pretended to be asleep to avoid talking.",hint:''},
+    {type:'never',emoji:'🤫',q:"Never have I ever told someone else's secret by accident.",hint:''},
+    {type:'never',emoji:'🍕',q:"Never have I ever eaten food that fell on the floor.",hint:'5 second rule counts.'},
+  ],
+  would:[
+    {type:'would',emoji:'💀',q:"Would you rather know when you'll die OR how you'll die?",hint:'no skipping.'},
+    {type:'would',emoji:'📱',q:"Would you rather have your search history public OR your bank account public?",hint:''},
+    {type:'would',emoji:'🌏',q:"Would you rather be famous and broke OR rich and unknown?",hint:''},
+    {type:'would',emoji:'🧠',q:"Would you rather read everyone's thoughts for a day OR have everyone read yours?",hint:''},
+    {type:'would',emoji:'💔',q:"Would you rather date someone your parents love but you find boring OR someone you love but they hate?",hint:''},
+    {type:'would',emoji:'🔥',q:"Would you rather have no WiFi for a month OR no AC for a month?",hint:'indian summer edition.'},
+    {type:'would',emoji:'👀',q:"Would you rather lose all your memories OR never be able to make new ones?",hint:''},
+    {type:'would',emoji:'💰',q:"Would you rather win ₹10 lakh today OR ₹1 crore in 10 years?",hint:''},
+  ],
+  desi:[
+    {type:'desi',emoji:'🫙',q:"Who in this room gives the most 'log kya kahenge' energy?",hint:'be honest.'},
+    {type:'desi',emoji:'🎬',q:"Rate the last Bollywood movie you watched. Honest review only.",hint:''},
+    {type:'desi',emoji:'😷',q:"Have you ever pretended to be sick to skip a family function?",hint:''},
+    {type:'desi',emoji:'💍',q:"Who in this group is most likely to get an arranged marriage without complaining?",hint:''},
+    {type:'desi',emoji:'📱',q:"If your mom saw your Instagram stories from last month — rate the disaster. 1-10.",hint:''},
+    {type:'desi',emoji:'🎭',q:"Which Bollywood villain are you most like? Be specific.",hint:''},
+    {type:'desi',emoji:'🏏',q:"Settle it: Virat or Rohit? Give your honest ranking.",hint:'no diplomatic answers.'},
+    {type:'desi',emoji:'🍛',q:"What's the most embarrassing thing you've done at a relative's wedding?",hint:''},
+  ],
+  hot:[
+    {type:'hot',emoji:'🌶️',q:"What's your most controversial opinion that you'd never say out loud normally?",hint:''},
+    {type:'hot',emoji:'👑',q:"Rank everyone here by how likely they are to become famous. Justify it.",hint:''},
+    {type:'hot',emoji:'🤐',q:"Who do you think is the fake-nice one in your friend group?",hint:'you can leave names out. or not.'},
+    {type:'hot',emoji:'💣',q:"What's the most unhinged thing someone has done for your attention?",hint:''},
+    {type:'hot',emoji:'🧨',q:"What's one thing about yourself that would genuinely shock everyone here?",hint:''},
+    {type:'hot',emoji:'🔥',q:"Be honest — who in this room do you think will be most successful in 10 years?",hint:'and why.'},
+  ],
+  spicy:[
+    {type:'18+',emoji:'🍑',q:"What's the most chaotic thing you've done while sober that people assumed you were drunk for?",hint:''},
+    {type:'18+',emoji:'💘',q:"Have you ever had feelings for someone in this room?",hint:'rate the awkwardness after.'},
+    {type:'18+',emoji:'📲',q:"What's the boldest thing you've ever texted someone at 2am?",hint:''},
+    {type:'18+',emoji:'🫣',q:"Who here do you think has the most interesting situationship history?",hint:''},
+    {type:'18+',emoji:'😈',q:"What's something you've done that you'd never post about but definitely should have?",hint:''},
+    {type:'18+',emoji:'💋',q:"Describe your ideal situationship in 3 words. No explaining allowed.",hint:''},
+    {type:'18+',emoji:'🔞',q:"What's the most savage thing you've done after a breakup?",hint:''},
+  ]
+};
+
+const TYPE_COLORS = {
+  truth:'#e8ff47', dare:'#ff8c42', never:'#44ffcc',
+  would:'#4488ff', desi:'#ff8c42', hot:'#ff4444', '18+':'#ff44aa'
+};
+
+const TYPE_LABELS = {
+  truth:'truth', dare:'dare', never:'never have i ever',
+  would:'would you rather', desi:'desi edition', hot:'spicy take', '18+':'18+ mode'
+};
+
+let selectedCats = ['truth'];
+let players = [];
+let queue = [];
+let currentQ = 0;
+let currentPlayer = 0;
+let skips = 0;
+let spicyUnlocked = false;
+
+// ---- CATEGORY TOGGLE ----
+function toggleCat(el, isLocked) {
+  if (isLocked && !spicyUnlocked) {
+    openLockModal();
+    return;
+  }
+  const cat = el.dataset.cat;
+  if (el.classList.contains('on')) {
+    if (selectedCats.length === 1) { showToast("pick at least 1 category"); return; }
+    el.classList.remove('on');
+    selectedCats = selectedCats.filter(c => c !== cat);
+  } else {
+    el.classList.add('on');
+    selectedCats.push(cat);
+  }
+}
+
+// ---- PLAYERS ----
+function addPlayer() {
+  const input = document.getElementById('nameInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (players.length >= 10) { showToast("max 10 players!"); return; }
+  if (players.includes(name)) { showToast("name already added"); return; }
+  players.push(name);
+  input.value = '';
+  renderPlayers();
+  input.focus();
+}
+
+function removePlayer(i) {
+  players.splice(i, 1);
+  renderPlayers();
+}
+
+function renderPlayers() {
+  const container = document.getElementById('playerTags');
+  if (players.length === 0) {
+    container.innerHTML = '<div style="font-size:13px;color:var(--muted);align-self:center;">add at least 2 players</div>';
+  } else {
+    container.innerHTML = players.map((p, i) => `
+      <div class="player-tag">
+        ${p}
+        <button onclick="removePlayer(${i})">×</button>
+      </div>
+    `).join('');
+  }
+  document.getElementById('startBtn').disabled = players.length < 2;
+}
+
+// ---- GAME ----
+function buildQueue() {
+  let pool = [];
+  selectedCats.forEach(cat => {
+    if (QUESTIONS[cat]) pool = pool.concat(QUESTIONS[cat]);
+  });
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool;
+}
+
+function startGame() {
+  queue = buildQueue();
+  currentQ = 0; currentPlayer = 0; skips = 0;
+  showScreen('game');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (currentQ >= queue.length) { endGame(); return; }
+  const q = queue[currentQ];
+  const color = TYPE_COLORS[q.type] || '#e8ff47';
+  const card = document.getElementById('qCard');
+  card.classList.add('hide');
+  setTimeout(() => {
+    document.getElementById('qEmoji').textContent = q.emoji;
+    document.getElementById('qType').textContent = TYPE_LABELS[q.type] || q.type;
+    document.getElementById('qType').style.color = color;
+    document.getElementById('qText').textContent = q.q;
+    document.getElementById('qHint').textContent = q.hint || '';
+    document.getElementById('qCard').style.setProperty('--q-color', color);
+    const total = queue.length;
+    document.getElementById('qCounter').textContent = `${currentQ + 1} / ${total}`;
+    document.getElementById('progressBar').style.width = `${Math.round(((currentQ + 1) / total) * 100)}%`;
+    const player = players[currentPlayer % players.length];
+    document.getElementById('turnBanner').innerHTML = `<strong>${player}'s</strong> turn`;
+    card.classList.remove('hide');
+  }, 160);
+}
+
+function nextQ(skip) {
+  if (skip) skips++;
+  else currentPlayer++;
+  currentQ++;
+  renderQuestion();
+}
+
+function endGame() {
+  document.getElementById('endPlayers').textContent = players.length;
+  document.getElementById('endRounds').textContent = currentQ;
+  document.getElementById('endSkips').textContent = skips;
+  showScreen('endscreen');
+}
+
+function playAgain() {
+  queue = buildQueue();
+  currentQ = 0; currentPlayer = 0; skips = 0;
+  showScreen('game');
+  renderQuestion();
+}
+
+function quitGame() {
+  if (confirm('quit the game?')) goHome();
+}
+
+function goHome() {
+  showScreen('home');
+}
+
+// ---- SCREENS ----
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ---- LOCK MODAL ----
+function openLockModal() {
+  document.getElementById('lockModal').classList.add('open');
+}
+
+function closeLockModal() {
+  document.getElementById('lockModal').classList.remove('open');
+}
+
+function closeLock(e) {
+  if (e.target === document.getElementById('lockModal')) closeLockModal();
+}
+
+function handlePay() {
+  // Razorpay integration goes here
+  // For now show coming soon
+  closeLockModal();
+  showToast("payment coming soon! follow @nocap.app");
+  // Once Razorpay is set up, replace above with:
+  // var rzp = new Razorpay({ key:'YOUR_KEY', amount:4900, currency:'INR', ... })
+  // rzp.open();
+}
+
+// ---- TOAST ----
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
