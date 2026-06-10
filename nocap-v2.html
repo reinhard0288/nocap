@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>No Cap — Squad Games. Zero Filter.</title>
+<meta name="description" content="The wildest Indian party game. Truth or Dare, Rapid Fire, Secret Vote, Spin the Bottle and more.">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="No Cap">
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:#0a0a0a;color:#f0f0f0;font-family:'DM Sans',sans-serif;min-height:100dvh;overflow-x:hidden}
+
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --bg:#0a0a0a;
+  --surface:#141414;
+  --card:#1a1a1a;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.14);
+  --text:#f0f0f0;
+  --muted:#5a5a5a;
+  --accent:#e8ff47;
+  --red:#ff4444;
+  --orange:#ff8c42;
+  --blue:#4d9fff;
+  --pink:#ff44aa;
+  --teal:#44ffcc;
+  --purple:#aa44ff;
+  --r:14px;
+}
+
+/* ============ SCREENS ============ */
+.screen{display:none;min-height:100dvh;flex-direction:column}
+.screen.active{display:flex}
+
+/* ============ HOME ============ */
+#home{padding:0;overflow-y:auto}
+.home-header{padding:40px 20px 0;text-align:center}
+.app-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.app-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,22vw,110px);line-height:0.85;color:var(--accent);text-shadow:0 0 80px rgba(232,255,71,0.15)}
+.app-sub{font-size:13px;color:var(--muted);margin-top:8px;font-style:italic}
+
+.home-body{padding:28px 20px 40px;display:flex;flex-direction:column;gap:28px}
+
+.section-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+/* MODE GRID */
+.mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.mode-btn{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;text-align:left;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.15s}
+.mode-btn:active{transform:scale(0.97)}
+.mode-btn.on{border-color:var(--mc,var(--accent));background:color-mix(in srgb,var(--mc,var(--accent)) 8%,var(--card))}
+.mode-btn .m-icon{font-size:22px;display:block;margin-bottom:6px}
+.mode-btn .m-name{font-size:13px;font-weight:600;color:var(--text)}
+.mode-btn .m-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.mode-btn .m-badge{position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;background:var(--orange);color:#000}
+
+/* SPECIAL MODE CARDS (full width) */
+.mode-special{grid-column:span 2;display:flex;align-items:center;gap:14px;padding:16px}
+.mode-special .m-icon{font-size:28px;margin:0}
+.mode-special .m-info{flex:1}
+.mode-special .m-name{font-size:15px}
+
+/* PLAYERS */
+.player-tags{display:flex;flex-wrap:wrap;gap:8px;min-height:36px}
+.player-tag{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:6px 12px;font-size:13px;animation:popIn 0.2s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+.player-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0}
+.add-row{display:flex;gap:8px}
+.add-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:10px 16px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s}
+.add-row input:focus{border-color:var(--border2)}
+.add-row input::placeholder{color:var(--muted)}
+.add-row button{width:42px;height:42px;background:var(--surface);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* CTA */
+.cta{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--r);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s}
+.cta:hover{background:#fff}
+.cta:disabled{background:var(--surface);color:var(--muted);cursor:not-allowed}
+.cta-outline{background:transparent;border:2px solid var(--accent);color:var(--accent)}
+.cta-outline:hover{background:var(--accent);color:#000}
+
+/* ============ GAME SCREEN ============ */
+#game{justify-content:space-between}
+.g-top{padding:16px 20px 0;display:flex;justify-content:space-between;align-items:center}
+.g-mode-badge{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:var(--surface);color:var(--muted)}
+.g-counter{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+.g-progress{padding:10px 20px 0}
+.g-track{width:100%;height:2px;background:var(--surface);border-radius:99px;overflow:hidden}
+.g-fill{height:100%;background:var(--accent);border-radius:99px;transition:width 0.4s ease}
+.g-turn{text-align:center;padding:14px 20px 0;font-size:14px;color:var(--muted)}
+.g-turn strong{color:var(--text);font-size:16px}
+.g-area{flex:1;display:flex;align-items:center;justify-content:center;padding:16px 20px}
+.q-card{width:100%;max-width:440px;background:var(--card);border:1px solid var(--border);border-radius:22px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;position:relative;overflow:hidden;transition:opacity 0.15s,transform 0.15s}
+.q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--qc,var(--accent))}
+.q-card.hide{opacity:0;transform:translateY(10px) scale(0.98)}
+.q-emoji{font-size:40px}
+.q-type{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--qc,var(--accent));background:rgba(255,255,255,0.05);padding:3px 10px;border-radius:99px}
+.q-text{font-size:clamp(17px,4.5vw,22px);font-weight:600;line-height:1.4;color:var(--text)}
+.q-hint{font-size:12px;color:var(--muted);font-style:italic}
+.g-bottom{padding:14px 20px 32px;display:flex;flex-direction:column;gap:10px}
+.btn-row{display:flex;gap:10px}
+.skip-btn{flex:1;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--muted);font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.skip-btn:hover{border-color:var(--border2);color:var(--text)}
+.next-btn{flex:2;padding:14px;background:var(--accent);border:none;border-radius:var(--r);color:#000;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.next-btn:hover{background:#fff}
+.score-bar{display:flex;justify-content:center;gap:16px;padding:0 20px}
+.score-item{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace}
+.score-item span{color:var(--accent);font-weight:700}
+
+/* ============ RAPID FIRE ============ */
+#rapid{justify-content:space-between;background:var(--bg)}
+.rf-top{padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center}
+.rf-player{text-align:center;padding:16px 20px 0}
+.rf-player-name{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--accent);line-height:1}
+.rf-player-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.rf-timer-wrap{display:flex;justify-content:center;padding:16px 20px}
+.rf-timer{width:90px;height:90px;border-radius:50%;border:3px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--text);position:relative;transition:border-color 0.3s,color 0.3s}
+.rf-timer.danger{border-color:var(--red);color:var(--red);animation:shake 0.3s infinite}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+.rf-area{flex:1;display:flex;align-items:center;justify-content:center;padding:0 20px}
+.rf-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border2);border-radius:22px;padding:32px 24px;text-align:center;transition:opacity 0.1s,transform 0.1s}
+.rf-card.hide{opacity:0;transform:scale(0.95)}
+.rf-q{font-size:clamp(20px,5.5vw,28px);font-weight:600;line-height:1.35;color:var(--text)}
+.rf-bottom{padding:14px 20px 32px;display:flex;flex-direction:column;gap:10px}
+.rf-answered{text-align:center;font-size:13px;color:var(--muted);font-family:'Space Mono',monospace}
+.rf-answered span{color:var(--teal);font-weight:700}
+
+/* RF SETUP */
+.rf-setup{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px 20px;text-align:center}
+.rf-setup-title{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--accent);line-height:1}
+.rf-setup-sub{font-size:14px;color:var(--muted);line-height:1.6;max-width:300px}
+.rf-player-list{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:360px}
+.rf-player-btn{padding:10px 18px;border-radius:99px;border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.rf-player-btn:hover,.rf-player-btn.selected{background:var(--accent);color:#000;border-color:var(--accent)}
+
+/* RF RESULT */
+.rf-result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px 20px;text-align:center}
+.rf-result-title{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--accent);line-height:1}
+.rf-result-score{font-size:18px;color:var(--muted)}
+.rf-result-score strong{color:var(--text);font-size:32px}
+.rf-badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.rf-badge{font-size:12px;padding:6px 14px;border-radius:99px;font-weight:600}
+
+/* ============ SECRET VOTE ============ */
+#vote{justify-content:space-between}
+.sv-top{padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center}
+.sv-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:20px;text-align:center}
+.sv-q-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border2);border-radius:22px;padding:28px 20px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.sv-q-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--pink)}
+.sv-q-text{font-size:clamp(18px,5vw,24px);font-weight:600;line-height:1.4;color:var(--text)}
+.sv-q-sub{font-size:13px;color:var(--muted)}
+.vote-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:400px}
+.vote-btn{padding:10px 18px;border-radius:99px;border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.vote-btn:hover{border-color:var(--pink);color:var(--pink)}
+.vote-btn.voted{background:var(--pink);border-color:var(--pink);color:#000}
+.sv-progress-dots{display:flex;gap:8px}
+.sv-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:background 0.3s}
+.sv-dot.done{background:var(--pink)}
+
+/* REVEAL */
+.sv-reveal{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;gap:20px;text-align:center}
+.sv-reveal-q{font-size:16px;color:var(--muted);max-width:320px;line-height:1.5}
+.sv-reveal-winner{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,15vw,80px);color:var(--accent);line-height:1;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+.sv-reveal-sub{font-size:14px;color:var(--muted)}
+.sv-result-bars{width:100%;max-width:360px;display:flex;flex-direction:column;gap:10px}
+.sv-bar-row{display:flex;align-items:center;gap:10px}
+.sv-bar-name{font-size:13px;font-weight:600;min-width:70px;text-align:right;color:var(--text)}
+.sv-bar-track{flex:1;height:8px;background:var(--surface);border-radius:99px;overflow:hidden}
+.sv-bar-fill{height:100%;background:var(--pink);border-radius:99px;transition:width 0.8s ease}
+.sv-bar-count{font-size:12px;color:var(--muted);min-width:20px;font-family:'Space Mono',monospace}
+
+/* ============ SPIN BOTTLE ============ */
+#spin{justify-content:space-between}
+.sp-top{padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center}
+.sp-round{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
+.sp-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:0}
+.sp-circle{position:relative;width:min(300px,78vw);height:min(300px,78vw)}
+.sp-player-dot{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;transform:translate(-50%,-50%);transition:all 0.3s}
+.sp-avatar{width:40px;height:40px;border-radius:50%;background:var(--card);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--text);transition:all 0.3s}
+.sp-player-dot.winner .sp-avatar{border-color:var(--accent);background:rgba(232,255,71,0.12);transform:scale(1.25);box-shadow:0 0 20px rgba(232,255,71,0.35)}
+.sp-pname{font-size:10px;color:var(--muted);font-weight:600;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color 0.3s}
+.sp-player-dot.winner .sp-pname{color:var(--accent)}
+.sp-bottle-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;display:flex;align-items:center;justify-content:center}
+.sp-bottle{width:64px;height:64px;transform-origin:center;filter:drop-shadow(0 0 10px rgba(232,255,71,0.25))}
+.sp-bottom{padding:14px 20px 32px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.sp-spin-btn{width:100%;max-width:360px;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--r);font-family:'Bebas Neue',sans-serif;font-size:22px;cursor:pointer;transition:all 0.2s}
+.sp-spin-btn:hover{background:#fff}
+.sp-spin-btn:disabled{background:var(--surface);color:var(--muted);cursor:not-allowed}
+
+/* BOTTLE WINNER OVERLAY */
+.sp-winner-overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.92);flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center}
+.sp-winner-overlay.show{display:flex}
+.sp-winner-label{font-size:14px;color:var(--muted)}
+.sp-winner-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,15vw,80px);color:var(--accent);line-height:1;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+.sp-winner-card{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:24px 20px;max-width:340px;width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;animation:slideUp 0.35s 0.1s both}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.sp-q-type{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,0.06)}
+.sp-q-text{font-size:18px;font-weight:600;color:var(--text);line-height:1.4}
+.sp-q-hint{font-size:12px;color:var(--muted);font-style:italic}
+.sp-next-btn{width:100%;max-width:340px;padding:14px;background:var(--accent);color:#000;border:none;border-radius:var(--r);font-family:'Bebas Neue',sans-serif;font-size:20px;cursor:pointer}
+
+/* ============ SCOREBOARD ============ */
+#scoreboard{align-items:center;justify-content:center;gap:24px;padding:40px 20px;text-align:center;overflow-y:auto}
+.sb-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,16vw,80px);color:var(--accent);line-height:1}
+.sb-sub{font-size:15px;color:var(--muted)}
+.sb-awards{display:flex;flex-direction:column;gap:10px;width:100%;max-width:380px}
+.sb-award{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;gap:14px;animation:slideUp 0.4s both}
+.sb-award:nth-child(1){animation-delay:0.1s}
+.sb-award:nth-child(2){animation-delay:0.2s}
+.sb-award:nth-child(3){animation-delay:0.3s}
+.sb-award:nth-child(4){animation-delay:0.4s}
+.award-icon{font-size:28px}
+.award-info{flex:1;text-align:left}
+.award-title{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.1em}
+.award-name{font-size:18px;font-weight:700;color:var(--text);margin-top:2px}
+.sb-stats{display:flex;gap:24px;justify-content:center}
+.sb-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.sb-stat-num{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--text);line-height:1}
+.sb-stat-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em}
+.share-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;font-size:13px;color:var(--muted);line-height:1.7;max-width:340px;text-align:left}
+.share-card strong{color:var(--text)}
+.sb-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
+
+/* ============ SHARED UTILS ============ */
+.quit-btn{background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:7px 14px;color:var(--muted);font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif}
+.quit-btn:hover{color:var(--text);border-color:var(--border2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#000;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* UNLOCK MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.88);align-items:flex-end;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:24px 24px 16px 16px;padding:28px 24px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px;text-align:center;animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1)}
+.modal-icon{font-size:44px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--accent)}
+.modal-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.modal-price{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--text)}
+.modal-price span{font-size:20px;color:var(--muted)}
+.modal-features{display:flex;flex-direction:column;gap:8px;text-align:left}
+.modal-feature{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.modal-feature::before{content:'✓';color:var(--accent);font-weight:700;min-width:14px}
+.pay-btn{width:100%;padding:15px;background:var(--accent);color:#000;border:none;border-radius:var(--r);font-family:'Bebas Neue',sans-serif;font-size:20px;cursor:pointer}
+.modal-close{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif}
+.pay-note{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace}
+
+/* INSTALL BANNER */
+#installBanner{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;padding:14px 16px;background:var(--card);border-top:1px solid var(--border2)}
+.install-inner{display:flex;align-items:center;gap:12px;max-width:440px;margin:0 auto}
+.install-inner button.install-btn{background:var(--accent);color:#000;border:none;border-radius:99px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.install-inner button.dismiss-btn{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
+.install-text{flex:1}
+.install-text strong{font-size:13px;color:var(--text);display:block}
+.install-text span{font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- ========== HOME ========== -->
+<div class="screen active" id="home">
+  <div class="home-header">
+    <div class="app-tag">squad party game · india</div>
+    <div class="app-name">NO<br>CAP</div>
+    <div class="app-sub">zero filter. pure chaos.</div>
+  </div>
+  <div class="home-body">
+
+    <div>
+      <div class="section-label">pick your mode</div>
+      <div class="mode-grid" id="modeGrid">
+        <div class="mode-btn on" data-mode="truth" style="--mc:#e8ff47" onclick="toggleMode(this)">
+          <span class="m-icon">😳</span>
+          <div class="m-name">Truth or Dare</div>
+          <div class="m-desc">no filter allowed</div>
+        </div>
+        <div class="mode-btn" data-mode="never" style="--mc:#44ffcc" onclick="toggleMode(this)">
+          <span class="m-icon">🍻</span>
+          <div class="m-name">Never Have I Ever</div>
+          <div class="m-desc">who's the wildest</div>
+        </div>
+        <div class="mode-btn" data-mode="would" style="--mc:#4d9fff" onclick="toggleMode(this)">
+          <span class="m-icon">🤔</span>
+          <div class="m-name">Would You Rather</div>
+          <div class="m-desc">impossible choices</div>
+        </div>
+        <div class="mode-btn" data-mode="desi" style="--mc:#ff8c42" onclick="toggleMode(this)">
+          <span class="m-icon">🎬</span>
+          <div class="m-name">Desi Edition</div>
+          <div class="m-desc">hostel · college · india</div>
+        </div>
+        <div class="mode-btn" data-mode="spicy" style="--mc:#ff44aa" onclick="toggleMode(this, true)">
+          <span class="m-icon">🌶️</span>
+          <div class="m-name">Spicy Mode</div>
+          <div class="m-desc">adults only chaos</div>
+          <div class="m-badge">₹99</div>
+        </div>
+        <div class="mode-btn" data-mode="roast" style="--mc:#ff4444" onclick="toggleMode(this)">
+          <span class="m-icon">💀</span>
+          <div class="m-name">Roast Mode</div>
+          <div class="m-desc">fill in the blank</div>
+        </div>
+        <div class="mode-btn mode-special" data-mode="rapid" style="--mc:#e8ff47" onclick="startRapidFire()">
+          <span class="m-icon">⚡</span>
+          <div class="m-info">
+            <div class="m-name">Rapid Fire</div>
+            <div class="m-desc">30 seconds · no thinking · pure chaos</div>
+          </div>
+        </div>
+        <div class="mode-btn mode-special" data-mode="vote" style="--mc:#ff44aa" onclick="startSecretVote()">
+          <span class="m-icon">🗳️</span>
+          <div class="m-info">
+            <div class="m-name">Secret Voting</div>
+            <div class="m-desc">vote anonymously · dramatic reveal</div>
+          </div>
+        </div>
+        <div class="mode-btn mode-special" data-mode="spin" style="--mc:#44ffcc" onclick="startSpinSetup()">
+          <span class="m-icon">🍾</span>
+          <div class="m-info">
+            <div class="m-name">Spin the Bottle</div>
+            <div class="m-desc">bottle picks · player answers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">who's playing</div>
+      <div class="player-tags" id="playerTags">
+        <div style="font-size:13px;color:var(--muted);padding:8px 0">add at least 2 players to start</div>
+      </div>
+      <div class="add-row" style="margin-top:10px">
+        <input type="text" id="nameInput" placeholder="enter name..." maxlength="16" onkeydown="if(event.key==='Enter')addPlayer()">
+        <button onclick="addPlayer()">+</button>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="cta" id="startBtn" disabled onclick="startGame()">START THE CHAOS</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== GAME ========== -->
+<div class="screen" id="game">
+  <div class="g-top">
+    <button class="quit-btn" onclick="quitToHome()">✕ quit</button>
+    <div class="g-mode-badge" id="gModeBadge">truth or dare</div>
+    <div class="g-counter" id="gCounter">1/25</div>
+  </div>
+  <div class="g-progress"><div class="g-track"><div class="g-fill" id="gFill" style="width:4%"></div></div></div>
+  <div class="g-turn" id="gTurn"><strong>Rahul's</strong> turn</div>
+  <div class="g-area">
+    <div class="q-card" id="qCard">
+      <div class="q-emoji" id="qEmoji">😳</div>
+      <div class="q-type" id="qType">truth</div>
+      <div class="q-text" id="qText">Loading...</div>
+      <div class="q-hint" id="qHint"></div>
+    </div>
+  </div>
+  <div class="g-bottom">
+    <div class="score-bar" id="scoreBar"></div>
+    <div class="btn-row">
+      <button class="skip-btn" onclick="nextQ(true)">skip</button>
+      <button class="next-btn" onclick="nextQ(false)">done ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== RAPID FIRE ========== -->
+<div class="screen" id="rapid">
+
+  <!-- SETUP -->
+  <div id="rfSetup" style="display:flex;flex:1;flex-direction:column">
+    <div class="rf-top">
+      <button class="quit-btn" onclick="quitToHome()">✕ quit</button>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent)">RAPID FIRE ⚡</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="rf-setup">
+      <div class="rf-setup-title">WHO'S<br>IN THE<br>HOT SEAT?</div>
+      <div class="rf-setup-sub">Pick a player. They get 30 seconds and 10 questions. No thinking allowed.</div>
+      <div class="rf-player-list" id="rfPlayerList"></div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="rfGame" style="display:none;flex:1;flex-direction:column">
+    <div class="rf-top">
+      <button class="quit-btn" onclick="endRapidFire()">✕ end</button>
+      <div class="rf-timer" id="rfTimer">30</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="rf-player" id="rfPlayerDisplay">
+      <div class="rf-player-name" id="rfActiveName">Rahul</div>
+      <div class="rf-player-sub">answer as fast as you can!</div>
+    </div>
+    <div class="rf-area">
+      <div class="rf-card" id="rfCard">
+        <div class="rf-q" id="rfQ">Tea or Coffee?</div>
+      </div>
+    </div>
+    <div class="rf-bottom">
+      <div class="rf-answered">answered: <span id="rfAnswered">0</span></div>
+      <button class="next-btn" onclick="rfNext()" style="width:100%">answered ✓</button>
+      <button class="skip-btn" onclick="rfNext()" style="width:100%">skip →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="rfResult" style="display:none;flex:1;flex-direction:column">
+    <div class="rf-result">
+      <div class="rf-result-title" id="rfResultTitle">RAHUL<br>SURVIVED!</div>
+      <div class="rf-result-score">answered <strong id="rfResultScore">7</strong> questions</div>
+      <div class="rf-badges" id="rfResultBadges"></div>
+      <button class="cta" style="max-width:320px;width:100%" onclick="rfPlayAgain()">NEXT PLAYER ⚡</button>
+      <button class="skip-btn" style="width:100%;max-width:320px;border-radius:var(--r)" onclick="quitToHome()">back to home</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========== SECRET VOTE ========== -->
+<div class="screen" id="vote">
+  <div class="sv-top">
+    <button class="quit-btn" onclick="quitToHome()">✕ quit</button>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pink)">SECRET VOTE 🗳️</div>
+    <div class="sv-progress-dots" id="svDots"></div>
+  </div>
+
+  <!-- VOTING -->
+  <div id="svVoting" style="flex:1;display:flex;flex-direction:column">
+    <div class="sv-area">
+      <div class="sv-q-card">
+        <div class="sv-q-label">who is most likely to...</div>
+        <div class="sv-q-text" id="svQuestion">get placed first?</div>
+        <div class="sv-q-sub" id="svQSub">tap a name to vote anonymously</div>
+      </div>
+      <div class="vote-grid" id="voteGrid"></div>
+    </div>
+  </div>
+
+  <!-- REVEAL -->
+  <div id="svReveal" style="flex:1;display:none;flex-direction:column">
+    <div class="sv-reveal">
+      <div class="sv-q-text" id="svRevealQ" style="font-size:14px;color:var(--muted);max-width:300px;line-height:1.5"></div>
+      <div class="sv-reveal-winner" id="svWinner">Rahul</div>
+      <div class="sv-reveal-sub" id="svWinnerVotes">got 3 out of 4 votes</div>
+      <div class="sv-result-bars" id="svBars"></div>
+      <button class="cta" style="max-width:320px;width:100%;margin-top:8px" onclick="svNext()">NEXT QUESTION →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SPIN BOTTLE ========== -->
+<div class="screen" id="spin">
+  <div class="sp-top">
+    <button class="quit-btn" onclick="quitToHome()">✕ quit</button>
+    <div class="sp-round" id="spRound">round 1</div>
+  </div>
+  <div class="sp-area">
+    <div class="sp-circle" id="spCircle">
+      <div class="sp-bottle-wrap">
+        <svg class="sp-bottle" id="spBottle" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="32" cy="44" rx="12" ry="16" fill="#e8ff47" opacity="0.9"/>
+          <rect x="28" y="22" width="8" height="16" rx="3" fill="#e8ff47" opacity="0.9"/>
+          <rect x="29" y="17" width="6" height="7" rx="2" fill="#b8cc00"/>
+          <ellipse cx="27" cy="39" rx="2.5" ry="5" fill="white" opacity="0.18"/>
+          <polygon points="32,4 37,17 27,17" fill="#ff4444"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="sp-bottom">
+    <button class="sp-spin-btn" id="spBtn" onclick="spinBottle()">SPIN 🍾</button>
+    <button class="skip-btn" onclick="quitToHome()" style="width:100%;max-width:360px;border-radius:var(--r)">back to home</button>
+  </div>
+</div>
+
+<!-- SPIN WINNER OVERLAY -->
+<div class="sp-winner-overlay" id="spWinnerOverlay">
+  <div class="sp-winner-label">the bottle chose</div>
+  <div class="sp-winner-name" id="spWinnerName">Rahul</div>
+  <div class="sp-winner-card">
+    <div class="sp-q-type" id="spQType" style="color:var(--accent)">truth</div>
+    <div class="sp-q-text" id="spQText">Loading...</div>
+    <div class="sp-q-hint" id="spQHint"></div>
+  </div>
+  <button class="sp-next-btn" onclick="closeSpinWinner()">SPIN AGAIN →</button>
+</div>
+
+<!-- ========== SCOREBOARD ========== -->
+<div class="screen" id="scoreboard">
+  <div class="sb-title">GG!</div>
+  <div class="sb-sub">that was absolutely unhinged 💀</div>
+  <div class="sb-stats">
+    <div class="sb-stat"><div class="sb-stat-num" id="sbPlayers">4</div><div class="sb-stat-label">players</div></div>
+    <div class="sb-stat"><div class="sb-stat-num" id="sbRounds">20</div><div class="sb-stat-label">rounds</div></div>
+    <div class="sb-stat"><div class="sb-stat-num" id="sbSkips">3</div><div class="sb-stat-label">skips</div></div>
+  </div>
+  <div class="sb-awards" id="sbAwards"></div>
+  <div class="share-card">
+    "just played <strong>No Cap</strong> with my squad and found out things i can NEVER unhear 💀<br>
+    try it → <strong>nocap-murex.vercel.app</strong>"
+  </div>
+  <div class="sb-btns">
+    <button class="cta" onclick="playAgain()">PLAY AGAIN</button>
+    <button class="skip-btn" onclick="quitToHome()" style="width:100%;border-radius:var(--r)">change settings</button>
+  </div>
+</div>
+
+<!-- UNLOCK MODAL -->
+<div class="modal-overlay" id="unlockModal" onclick="if(event.target===this)closeUnlock()">
+  <div class="modal">
+    <div class="modal-icon">🌶️</div>
+    <div class="modal-title">Spicy Mode</div>
+    <div class="modal-desc">unlock the most unfiltered, adults-only questions. not for the weak.</div>
+    <div class="modal-price">₹99 <span>one time · forever</span></div>
+    <div class="modal-features">
+      <div class="modal-feature">50+ exclusive spicy questions</div>
+      <div class="modal-feature">all future packs included free</div>
+      <div class="modal-feature">one payment, never expires</div>
+    </div>
+    <button class="pay-btn" onclick="handleUnlock()">UNLOCK EVERYTHING — ₹99</button>
+    <div class="pay-note">razorpay · 100% secure</div>
+    <button class="modal-close" onclick="closeUnlock()">maybe later</button>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="installBanner">
+  <div class="install-inner">
+    <div style="font-size:28px">🎮</div>
+    <div class="install-text">
+      <strong>Add No Cap to home screen</strong>
+      <span>play anytime, works offline</span>
+    </div>
+    <button class="install-btn" onclick="installApp()">Install</button>
+    <button class="dismiss-btn" onclick="dismissInstall()">×</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ QUESTIONS ============
+const Q = {
+  truth:[
+    {t:'truth',e:'😳',q:"What's the most embarrassing thing you've ever done in public?"},
+    {t:'dare',e:'🎯',q:"Text your crush right now with just 'hey'. Show the screen.",h:'no backing out.'},
+    {t:'truth',e:'🧠',q:"What's your most unhinged 3am thought that you've never told anyone?"},
+    {t:'dare',e:'🎭',q:"Do your best impression of someone in this room. They have to guess who."},
+    {t:'truth',e:'📱',q:"Which app on your phone would cause maximum damage if someone scrolled through it?"},
+    {t:'dare',e:'😂',q:"Send a voice note to your closest friend saying 'we need to talk' and wait for the panic."},
+    {t:'truth',e:'💀',q:"What's the worst lie you've ever told your parents and got away with?"},
+    {t:'truth',e:'👀',q:"Who in this room would you swap lives with for a week and why?"},
+    {t:'dare',e:'🎤',q:"Sing the chorus of the last song you listened to. Full voice. No humming."},
+    {t:'truth',e:'🤡',q:"Rate everyone in this room by main character energy. 1-10. Be brutal."},
+    {t:'truth',e:'😬',q:"What's the shadiest thing you've ever done that nobody in this room knows about?"},
+    {t:'dare',e:'📸',q:"Let the person on your left post any photo from your camera roll as their story."},
+    {t:'truth',e:'🧃',q:"Who do you have saved under a fake name in your contacts and why?"},
+    {t:'dare',e:'🤙',q:"Call someone right now and say 'I miss you' then hang up immediately."},
+    {t:'truth',e:'💸',q:"What's the most money you've ever wasted on something completely stupid?"},
+    {t:'truth',e:'🫣',q:"What's something you pretend to know but have absolutely zero clue about?"},
+    {t:'dare',e:'🕺',q:"Do your most embarrassing dance move. Everyone has to rate it 1-10."},
+    {t:'truth',e:'💔',q:"What's the pettiest thing you've ever done after a fight with someone?"},
+    {t:'dare',e:'🎪',q:"Let someone in the group go through your recent Google searches. No deleting."},
+    {t:'truth',e:'🌙',q:"What's the most desperate thing you've ever done to get someone's attention?"},
+    {t:'truth',e:'😮',q:"What's one habit you have that you'd be embarrassed if your parents found out?"},
+    {t:'dare',e:'📞',q:"FaceTime someone random from your contacts without warning. Must talk for 30 seconds."},
+    {t:'truth',e:'🏆',q:"Who in this group do you think will be most successful in 10 years? Be honest."},
+    {t:'truth',e:'🔮',q:"What's one thing about yourself that would genuinely shock everyone here?"},
+    {t:'dare',e:'💌',q:"Read out the last paragraph of your most recent notes app entry. No editing."},
+  ],
+  never:[
+    {t:'never',e:'👻',q:"Never have I ever ghosted someone I actually had feelings for.",h:'raise your hand.'},
+    {t:'never',e:'📸',q:"Never have I ever stalked someone's Instagram all the way back to 2016."},
+    {t:'never',e:'😭',q:"Never have I ever cried at a movie or show and lied about it."},
+    {t:'never',e:'🤥',q:"Never have I ever said 'I'm 5 minutes away' while still at home."},
+    {t:'never',e:'💬',q:"Never have I ever read a message, fully ignored it, and pretended I never saw it."},
+    {t:'never',e:'🧠',q:"Never have I ever rehearsed an entire argument in my head and won it."},
+    {t:'never',e:'💔',q:"Never have I ever liked my own post from a fake or second account."},
+    {t:'never',e:'😬',q:"Never have I ever pretended to be asleep to avoid a conversation."},
+    {t:'never',e:'🤫',q:"Never have I ever accidentally revealed someone's secret and blamed autocorrect."},
+    {t:'never',e:'🍕',q:"Never have I ever eaten food that fell on the floor and told no one."},
+    {t:'never',e:'📱',q:"Never have I ever dropped my phone on my face while lying in bed."},
+    {t:'never',e:'🎭',q:"Never have I ever laughed at a message and replied with 'haha yeah'."},
+    {t:'never',e:'🛌',q:"Never have I ever gone to sleep without washing my face and regretted it."},
+    {t:'never',e:'💸',q:"Never have I ever spent money I didn't have on something completely unnecessary."},
+    {t:'never',e:'🧃',q:"Never have I ever listened to a breakup playlist while in a perfectly happy relationship."},
+    {t:'never',e:'👀',q:"Never have I ever Googled myself to see what comes up."},
+    {t:'never',e:'😤',q:"Never have I ever cancelled plans and immediately felt relieved."},
+    {t:'never',e:'🔍',q:"Never have I ever searched for someone on social media I was pretending not to care about."},
+    {t:'never',e:'📞',q:"Never have I ever let a call go to voicemail and then texted 'sorry missed you'."},
+    {t:'never',e:'🏃',q:"Never have I ever left a party early by faking sick and then stayed up watching Netflix."},
+    {t:'never',e:'💭',q:"Never have I ever told someone I was busy when I was literally doing nothing."},
+    {t:'never',e:'🎵',q:"Never have I ever been deeply personally hurt by a song lyric."},
+    {t:'never',e:'🤳',q:"Never have I ever taken 20+ selfies just to use one."},
+    {t:'never',e:'🙈',q:"Never have I ever checked if someone is online and then pretended I hadn't noticed."},
+    {t:'never',e:'📝',q:"Never have I ever written something dramatic in my notes app and reread it later cringing."},
+  ],
+  would:[
+    {t:'would',e:'💀',q:"Would you rather know when you'll die OR how you'll die?",h:'no skipping this one.'},
+    {t:'would',e:'📱',q:"Would you rather have your search history public OR your bank account public?"},
+    {t:'would',e:'🌏',q:"Would you rather be famous and broke OR completely anonymous but insanely rich?"},
+    {t:'would',e:'🧠',q:"Would you rather read everyone's thoughts for one day OR have everyone read yours?"},
+    {t:'would',e:'💔',q:"Would you rather date someone your parents love but you find boring OR someone you're obsessed with but they hate?"},
+    {t:'would',e:'🔥',q:"Would you rather have no WiFi for a month OR no AC for a month?",h:'Indian summer counts.'},
+    {t:'would',e:'👀',q:"Would you rather lose all your memories OR never be able to make new ones?"},
+    {t:'would',e:'💰',q:"Would you rather win ₹10 lakh today OR ₹1 crore exactly 10 years from now?"},
+    {t:'would',e:'🎭',q:"Would you rather always say exactly what you're thinking OR never speak again?"},
+    {t:'would',e:'🏠',q:"Would you rather live in a penthouse alone forever OR in a tiny flat with your best friends?"},
+    {t:'would',e:'⏰',q:"Would you rather always be 30 minutes early OR always exactly 20 minutes late?"},
+    {t:'would',e:'🤳',q:"Would you rather have no social media for a year OR have all your DMs made public?"},
+    {t:'would',e:'🎓',q:"Would you rather know every language in the world OR be the best in the world at one skill?"},
+    {t:'would',e:'😴',q:"Would you rather never need to sleep OR never need to eat?"},
+    {t:'would',e:'🔮',q:"Would you rather know your future OR be able to change your past?"},
+    {t:'would',e:'🏆',q:"Would you rather be respected by everyone but disliked OR loved by a few but ignored by most?"},
+    {t:'would',e:'💊',q:"Would you rather feel no physical pain ever OR feel no emotional pain ever?"},
+    {t:'would',e:'🌍',q:"Would you rather travel everywhere but never have a home OR have a perfect home but never travel?"},
+    {t:'would',e:'🎵',q:"Would you rather only listen to one song forever OR never listen to music again?"},
+    {t:'would',e:'👁️',q:"Would you rather see the world in only black and white OR hear everything twice as loud?"},
+    {t:'would',e:'🤝',q:"Would you rather have 1 truly loyal best friend OR 100 people who like you but don't really know you?"},
+    {t:'would',e:'🧪',q:"Would you rather be able to fly but only at 5kmph OR teleport but arrive 10 mins late every time?"},
+    {t:'would',e:'📚',q:"Would you rather be the smartest person in every room OR the funniest?"},
+    {t:'would',e:'💬',q:"Would you rather only communicate through voice notes OR only through text forever?"},
+    {t:'would',e:'🌙',q:"Would you rather have one perfect day that repeats forever OR live a normal unpredictable life?"},
+  ],
+  desi:[
+    {t:'desi',e:'🏠',q:"Who in this room gives the most 'log kya kahenge' energy?",h:'be honest.'},
+    {t:'desi',e:'📚',q:"Who definitely started studying only the night before the exam? Name someone.",h:''},
+    {t:'desi',e:'🍛',q:"Who in this group has the most embarrassing hostel mess story?"},
+    {t:'desi',e:'🏏',q:"Settle it once and for all: Virat or Rohit? No diplomatic answers.",h:''},
+    {t:'desi',e:'💼',q:"Who in this group will get placed first? And who will become a startup founder?"},
+    {t:'desi',e:'😷',q:"Have you ever faked sick to skip a family function? Rate the excuse quality 1-10."},
+    {t:'desi',e:'🎬',q:"Which Bollywood villain are you most like? Give specific reasons.",h:''},
+    {t:'desi',e:'📱',q:"If your mom saw your Instagram stories from last 3 months, rate the disaster. 1-10."},
+    {t:'desi',e:'🏫',q:"Who in this group is most likely to get a government job just to make their parents happy?"},
+    {t:'desi',e:'🥘',q:"Who here has complained about hostel food but secretly eaten 3 servings?"},
+    {t:'desi',e:'💍',q:"Who in this group is most likely to have an arranged marriage without complaining even once?"},
+    {t:'desi',e:'🚗',q:"Who in this group drives the most dangerously but thinks they're a fantastic driver?"},
+    {t:'desi',e:'📞',q:"How many aunties in your family ask about your marks/job/marriage at every function? Count them."},
+    {t:'desi',e:'🎓',q:"Who copied the most assignments this semester? Point at someone."},
+    {t:'desi',e:'💤',q:"Who sleeps through every alarm and then blames network issues for being late?"},
+    {t:'desi',e:'🌶️',q:"What's the spiciest family drama that happened at the last family function?"},
+    {t:'desi',e:'🏆',q:"Who in this room would survive longest if they had to explain their career to a typical Indian uncle?"},
+    {t:'desi',e:'📺',q:"Rate the last Bollywood movie you watched honestly. No defending allowed.",h:''},
+    {t:'desi',e:'🎵',q:"What Bollywood song best describes your current life situation? Justify it."},
+    {t:'desi',e:'🤦',q:"What's the most jugaad solution you've ever come up with that actually worked?"},
+    {t:'desi',e:'🍜',q:"Maggi at 2am in the hostel or biryani at a dhaba — which memory hits different?"},
+    {t:'desi',e:'💰',q:"Who in this group will become a crorepati first? Give your honest prediction."},
+    {t:'desi',e:'🎯',q:"Who here has used 'network issues' as an excuse more than 5 times in the last month?"},
+    {t:'desi',e:'🌙',q:"What's the most chaotic thing that happened in your hostel or PG that you've never told your parents?"},
+    {t:'desi',e:'🤝',q:"Who in this group is most likely to become a politician someday? Give reasons."},
+  ],
+  spicy:[
+    {t:'spicy',e:'🌶️',q:"What's the most chaotic thing you've done sober that people assumed you were drunk for?"},
+    {t:'spicy',e:'💘',q:"Have you ever had feelings for someone in this room? Rate the awkwardness after.",h:''},
+    {t:'spicy',e:'📲',q:"What's the boldest thing you've ever texted someone at 2am?"},
+    {t:'spicy',e:'🫣',q:"Who here do you think has the most interesting situationship history?"},
+    {t:'spicy',e:'😈',q:"What's something you've done that you'd never post about but definitely should have?"},
+    {t:'spicy',e:'💋',q:"Describe your ideal situationship in 3 words. No explaining allowed."},
+    {t:'spicy',e:'🔞',q:"What's the most savage thing you've done after someone did you dirty?"},
+    {t:'spicy',e:'💭',q:"What's one thing you want from a relationship that you've never actually asked for?"},
+    {t:'spicy',e:'😏',q:"Who in your life do you think you have the most unresolved tension with?"},
+    {t:'spicy',e:'🧨',q:"What's one thing you've done romantically that you'd never admit to your parents?"},
+    {t:'spicy',e:'💔',q:"What's the most dramatic thing you've done after a crush rejected you?"},
+    {t:'spicy',e:'🎭',q:"Who in this room do you think flirts the most without realising it?"},
+    {t:'spicy',e:'🌙',q:"What's the most unhinged thing you've ever done because of feelings for someone?"},
+    {t:'spicy',e:'🔥',q:"Be honest — have you ever sent a risky text and then immediately wanted to delete your entire existence?"},
+    {t:'spicy',e:'👀',q:"Who in this room would you call at 3am if you were having a crisis?"},
+    {t:'spicy',e:'💫',q:"What's something about yourself romantically that you're still figuring out?"},
+    {t:'spicy',e:'🎯',q:"What's the most calculated thing you've ever done to make someone notice you?"},
+    {t:'spicy',e:'😬',q:"What's a green flag you look for in someone that others would find weird?"},
+    {t:'spicy',e:'🫀',q:"What's something you've felt deeply but never said out loud to anyone?"},
+    {t:'spicy',e:'🌊',q:"What's the most emotionally immature thing you've done in the last 6 months?"},
+    {t:'spicy',e:'🎪',q:"What's one thing you wish someone would do for you that you're too scared to ask for?"},
+    {t:'spicy',e:'💎',q:"What's the most expensive emotion you've ever felt?"},
+    {t:'spicy',e:'🗝️',q:"What's one thing someone could say to you that would immediately win you over?"},
+    {t:'spicy',e:'⚡',q:"What's one thing you know about yourself in relationships that you've never admitted?"},
+    {t:'spicy',e:'🌸',q:"What's the kindest thing anyone has ever done for you that made you cry?"},
+  ],
+  roast:[
+    {t:'roast',e:'💀',q:"_____ would survive a zombie apocalypse because _______.",h:'group fills in the blank.'},
+    {t:'roast',e:'🏆',q:"If _____ was a Bollywood movie, the title would be _______."},
+    {t:'roast',e:'📱',q:"_____'s phone screen time report would reveal that they're secretly _______."},
+    {t:'roast',e:'🎓',q:"On ______'s tombstone it would say: '_______'.",h:'make it funny, not mean.'},
+    {t:'roast',e:'💼',q:"If _____ had to sell one thing on OLX, it would be _______."},
+    {t:'roast',e:'🌶️',q:"The most accurate Google review of _____ would say _______."},
+    {t:'roast',e:'🤖',q:"If _____ was an AI assistant, their most common response would be _______."},
+    {t:'roast',e:'📺',q:"If _____ had a Netflix documentary, it would be titled _______."},
+    {t:'roast',e:'🎵',q:"The theme song of _____'s life would be _______ because _______."},
+    {t:'roast',e:'🔮',q:"In 10 years, _____ will definitely be known for _______."},
+    {t:'roast',e:'😂',q:"The most accurate emoji to describe _____ as a person is _______ because _______."},
+    {t:'roast',e:'💸',q:"If _____ had to write a self-help book, the title would be _______."},
+    {t:'roast',e:'🎭',q:"The role _____ would play in a Bollywood movie is _______ because _______."},
+    {t:'roast',e:'🏠',q:"If _____ was a household item, they'd be a _______ because _______."},
+    {t:'roast',e:'🌍',q:"If _____ was a country, they'd be _______ because _______."},
+    {t:'roast',e:'🎮',q:"_____'s dating profile bio would honestly say _______."},
+    {t:'roast',e:'🚗',q:"If _____ was a vehicle, they'd be a _______ and the reason is _______."},
+    {t:'roast',e:'🧠',q:"_____'s browser history titles would be _______, _______, and _______."},
+    {t:'roast',e:'⭐',q:"If _____ was a Zomato order, the review would say _______."},
+    {t:'roast',e:'🎪',q:"The WhatsApp group that best describes _____ would be called _______."},
+    {t:'roast',e:'💊',q:"If _____ was a medicine, the side effects would include _______."},
+    {t:'roast',e:'🌮',q:"If _____ was a street food, they'd be _______ because _______."},
+    {t:'roast',e:'📚',q:"If someone wrote a biography of _____, chapter one would start with _______."},
+    {t:'roast',e:'🎯',q:"_____'s superpower is clearly _______ but their kryptonite is definitely _______."},
+    {t:'roast',e:'🌙',q:"At 2am, _____ is definitely doing _______ and thinking about _______."},
+  ]
+};
+
+const RF_Q = [
+  "Tea or Coffee?","Love or Money?","Hostel or Home?","Android or iPhone?",
+  "Morning person or Night owl?","Last person you texted?","Who's most likely to become rich?",
+  "Biggest red flag in this room?","Cats or Dogs?","Call or Text?",
+  "Introvert or Extrovert?","Biggest fear?","Last lie you told?","BGMI or Free Fire?",
+  "Favourite teacher ever?","Most used emoji?","First thought when you wake up?",
+  "One word to describe yourself?","Best memory of this group?","Biggest regret?",
+  "Superpower you'd want?","Celebrity crush?","Favourite Bollywood song right now?",
+  "What are you most scared of?","Pizza or Biryani?","Instagram or Snapchat?",
+  "Mountains or Beach?","Dream job?","Biggest pet peeve?","Current mood in one emoji?",
+  "Delhi or Mumbai?","Most embarrassing song on your playlist?","Worst subject in school?",
+  "Who do you miss right now?","One thing you'd change about yourself?",
+  "Biggest achievement?","Night out or House party?","Most random skill you have?",
+  "What song is stuck in your head?","Dosa or Paratha?"
+];
+
+const SV_Q = [
+  {q:"get placed first?",sub:"who lands a job before everyone?"},
+  {q:"become a startup founder?",sub:"who's got the entrepreneur energy?"},
+  {q:"get married first?",sub:"who's sliding into shaadi season first?"},
+  {q:"become a millionaire?",sub:"who's got that crorepati energy?"},
+  {q:"ghost someone and feel zero guilt?",sub:"we all know who it is."},
+  {q:"forget their anniversary?",sub:"bro is cooked."},
+  {q:"become famous?",sub:"who's got the main character energy?"},
+  {q:"survive longest without their phone?",sub:"impossible for some."},
+  {q:"cry at a movie and deny it?",sub:"we've all seen it happen."},
+  {q:"still be in this city in 10 years?",sub:"some people never leave."},
+  {q:"become a CEO?",sub:"who's built for the corner office?"},
+  {q:"have the most chaotic love life?",sub:"they know who they are."},
+  {q:"go viral on Instagram?",sub:"who's one Reel away from fame?"},
+  {q:"accidentally start a fire while cooking?",sub:"hostel edition."},
+  {q:"still be using the same phone in 5 years?",sub:"some people are loyal."},
+];
+
+const TYPE_COLORS = {truth:'#e8ff47',dare:'#ff8c42',never:'#44ffcc',would:'#4d9fff',desi:'#ff8c42',spicy:'#ff44aa',roast:'#ff4444'};
+const TYPE_LABELS = {truth:'truth',dare:'dare',never:'never have i ever',would:'would you rather',desi:'desi edition',spicy:'spicy',roast:'roast'};
+
+// ============ STATE ============
+let selectedModes = ['truth'];
+let players = [];
+let queue = [];
+let currentQ = 0;
+let currentPlayer = 0;
+let skips = 0;
+let scores = {};
+let spicyUnlocked = JSON.parse(localStorage.getItem('spicyUnlocked') || 'false');
+
+// Spin state
+let bottleAngle = 0;
+let spRound = 1;
+let spQueue = [];
+let spCurrentQ = 0;
+let spinning = false;
+
+// Rapid fire state
+let rfPlayer = '';
+let rfQueue = [];
+let rfCurrentQ = 0;
+let rfAnswered = 0;
+let rfTimer = null;
+let rfTimeLeft = 30;
+
+// Secret vote state
+let svQueue = [];
+let svCurrentQ = 0;
+let svVotes = {};
+
+// ============ HOME ============
+function toggleMode(el, isLocked) {
+  if (isLocked && !spicyUnlocked) { openUnlock(); return; }
+  const mode = el.dataset.mode;
+  if (el.classList.contains('on')) {
+    if (selectedModes.length === 1) { showToast('pick at least 1 mode'); return; }
+    el.classList.remove('on');
+    selectedModes = selectedModes.filter(m => m !== mode);
+  } else {
+    el.classList.add('on');
+    if (!selectedModes.includes(mode)) selectedModes.push(mode);
+  }
+}
+
+function addPlayer() {
+  const input = document.getElementById('nameInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (players.length >= 10) { showToast('max 10 players!'); return; }
+  if (players.includes(name)) { showToast('name already added'); return; }
+  players.push(name);
+  scores[name] = 0;
+  input.value = '';
+  renderPlayers();
+  input.focus();
+}
+
+function removePlayer(i) {
+  delete scores[players[i]];
+  players.splice(i, 1);
+  renderPlayers();
+}
+
+function renderPlayers() {
+  const container = document.getElementById('playerTags');
+  if (players.length === 0) {
+    container.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0">add at least 2 players to start</div>';
+  } else {
+    container.innerHTML = players.map((p, i) => `
+      <div class="player-tag">${p}<button onclick="removePlayer(${i})">×</button></div>
+    `).join('');
+  }
+  document.getElementById('startBtn').disabled = players.length < 2;
+}
+
+// ============ GAME ============
+function buildQueue() {
+  let pool = [];
+  selectedModes.forEach(m => { if (Q[m]) pool = pool.concat(Q[m]); });
+  for (let i = pool.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]] = [pool[j],pool[i]];
+  }
+  return pool;
+}
+
+function startGame() {
+  queue = buildQueue();
+  currentQ = 0; currentPlayer = 0; skips = 0;
+  players.forEach(p => scores[p] = 0);
+  showScreen('game');
+  renderQ();
+}
+
+function renderQ() {
+  if (currentQ >= queue.length) { showScoreboard(); return; }
+  const q = queue[currentQ];
+  const color = TYPE_COLORS[q.t] || '#e8ff47';
+  const card = document.getElementById('qCard');
+  card.classList.add('hide');
+  setTimeout(() => {
+    document.getElementById('qEmoji').textContent = q.e || '🎯';
+    document.getElementById('qType').textContent = TYPE_LABELS[q.t] || q.t;
+    document.getElementById('qType').style.color = color;
+    document.getElementById('qCard').style.setProperty('--qc', color);
+    document.getElementById('qText').textContent = q.q;
+    document.getElementById('qHint').textContent = q.h || '';
+    document.getElementById('gCounter').textContent = `${currentQ+1}/${queue.length}`;
+    document.getElementById('gFill').style.width = `${Math.round(((currentQ+1)/queue.length)*100)}%`;
+    document.getElementById('gModeBadge').textContent = TYPE_LABELS[q.t] || q.t;
+    document.getElementById('gTurn').innerHTML = `<strong>${players[currentPlayer % players.length]}'s</strong> turn`;
+    renderScoreBar();
+    card.classList.remove('hide');
+  }, 150);
+}
+
+function renderScoreBar() {
+  const bar = document.getElementById('scoreBar');
+  const top3 = [...players].sort((a,b) => scores[b]-scores[a]).slice(0,3);
+  bar.innerHTML = top3.map(p => `<div class="score-item">${p} <span>${scores[p]}</span></div>`).join('');
+}
+
+function nextQ(skip) {
+  if (!skip) { scores[players[currentPlayer % players.length]] += 1; currentPlayer++; }
+  else skips++;
+  currentQ++;
+  renderQ();
+}
+
+function quitToHome() {
+  clearInterval(rfTimer);
+  document.getElementById('spWinnerOverlay').classList.remove('show');
+  showScreen('home');
+}
+
+function playAgain() {
+  startGame();
+}
+
+// ============ SCOREBOARD ============
+function showScoreboard() {
+  document.getElementById('sbPlayers').textContent = players.length;
+  document.getElementById('sbRounds').textContent = currentQ;
+  document.getElementById('sbSkips').textContent = skips;
+
+  const sorted = [...players].sort((a,b) => scores[b]-scores[a]);
+  const awards = [
+    {icon:'🏆',title:'Party MVP',name: sorted[0] || '?',color:'#e8ff47'},
+    {icon:'👑',title:'Chaos King',name: players[Math.floor(Math.random()*players.length)] || '?',color:'#ff8c42'},
+    {icon:'🤥',title:'Biggest Liar',name: players[Math.floor(Math.random()*players.length)] || '?',color:'#ff44aa'},
+    {icon:'😤',title:'Most Skips',name: sorted[sorted.length-1] || '?',color:'#4d9fff'},
+  ];
+
+  document.getElementById('sbAwards').innerHTML = awards.map(a => `
+    <div class="sb-award" style="border-left:3px solid ${a.color}">
+      <div class="award-icon">${a.icon}</div>
+      <div class="award-info">
+        <div class="award-title">${a.title}</div>
+        <div class="award-name">${a.name}</div>
+      </div>
+    </div>
+  `).join('');
+
+  showScreen('scoreboard');
+}
+
+// ============ RAPID FIRE ============
+function startRapidFire() {
+  if (players.length < 2) { showToast('add at least 2 players first!'); return; }
+  rfQueue = [...RF_Q].sort(() => Math.random()-0.5);
+  rfCurrentQ = 0; rfAnswered = 0;
+
+  document.getElementById('rfSetup').style.display = 'flex';
+  document.getElementById('rfGame').style.display = 'none';
+  document.getElementById('rfResult').style.display = 'none';
+
+  const list = document.getElementById('rfPlayerList');
+  list.innerHTML = players.map(p => `
+    <button class="rf-player-btn" onclick="pickRfPlayer('${p}',this)">${p}</button>
+  `).join('');
+
+  showScreen('rapid');
+}
+
+function pickRfPlayer(name, btn) {
+  document.querySelectorAll('.rf-player-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  rfPlayer = name;
+  setTimeout(() => beginRapidFire(), 300);
+}
+
+function beginRapidFire() {
+  rfCurrentQ = 0; rfAnswered = 0; rfTimeLeft = 30;
+  document.getElementById('rfSetup').style.display = 'none';
+  document.getElementById('rfGame').style.display = 'flex';
+  document.getElementById('rfResult').style.display = 'none';
+  document.getElementById('rfActiveName').textContent = rfPlayer.toUpperCase();
+  document.getElementById('rfQ').textContent = rfQueue[0];
+  document.getElementById('rfAnswered').textContent = 0;
+  updateRfTimer();
+  rfTimer = setInterval(() => {
+    rfTimeLeft--;
+    updateRfTimer();
+    if (rfTimeLeft <= 0) { clearInterval(rfTimer); showRfResult(); }
+  }, 1000);
+}
+
+function updateRfTimer() {
+  const el = document.getElementById('rfTimer');
+  el.textContent = rfTimeLeft;
+  el.classList.toggle('danger', rfTimeLeft <= 10);
+}
+
+function rfNext() {
+  rfAnswered++;
+  document.getElementById('rfAnswered').textContent = rfAnswered;
+  rfCurrentQ++;
+  if (rfCurrentQ >= rfQueue.length) { clearInterval(rfTimer); showRfResult(); return; }
+  const card = document.getElementById('rfCard');
+  card.classList.add('hide');
+  setTimeout(() => {
+    document.getElementById('rfQ').textContent = rfQueue[rfCurrentQ];
+    card.classList.remove('hide');
+  }, 100);
+}
+
+function showRfResult() {
+  clearInterval(rfTimer);
+  document.getElementById('rfGame').style.display = 'none';
+  document.getElementById('rfResult').style.display = 'flex';
+  document.getElementById('rfResultTitle').textContent = `${rfPlayer.toUpperCase()}\n${rfAnswered >= 7 ? 'IS FIRE! 🔥' : rfAnswered >= 4 ? 'SURVIVED!' : 'CRUMBLED 💀'}`;
+  document.getElementById('rfResultScore').textContent = rfAnswered;
+  scores[rfPlayer] = (scores[rfPlayer] || 0) + rfAnswered;
+
+  const badges = [];
+  if (rfAnswered >= 9) badges.push({label:'🔥 God Mode',color:'#ff4444'});
+  else if (rfAnswered >= 7) badges.push({label:'⚡ On Fire',color:'#ff8c42'});
+  else if (rfAnswered >= 4) badges.push({label:'✅ Survived',color:'#44ffcc'});
+  else badges.push({label:'💀 Crumbled',color:'#5a5a5a'});
+  if (rfAnswered === 0) badges.push({label:'🤡 Froze Up',color:'#ff44aa'});
+
+  document.getElementById('rfResultBadges').innerHTML = badges.map(b =>
+    `<div class="rf-badge" style="background:${b.color}20;color:${b.color};border:1px solid ${b.color}">${b.label}</div>`
+  ).join('');
+}
+
+function rfPlayAgain() { startRapidFire(); }
+function endRapidFire() { clearInterval(rfTimer); quitToHome(); }
+
+// ============ SECRET VOTE ============
+function startSecretVote() {
+  if (players.length < 2) { showToast('add at least 2 players first!'); return; }
+  svQueue = [...SV_Q].sort(() => Math.random()-0.5).slice(0,5);
+  svCurrentQ = 0; svVotes = {};
+
+  renderSvQuestion();
+  showScreen('vote');
+}
+
+function renderSvQuestion() {
+  const q = svQueue[svCurrentQ];
+  document.getElementById('svVoting').style.display = 'flex';
+  document.getElementById('svReveal').style.display = 'none';
+
+  document.getElementById('svQuestion').textContent = q.q;
+  document.getElementById('svQSub').textContent = q.sub || 'tap a name to vote';
+
+  svVotes[svCurrentQ] = {};
+  players.forEach(p => svVotes[svCurrentQ][p] = 0);
+
+  document.getElementById('voteGrid').innerHTML = players.map(p => `
+    <button class="vote-btn" id="vbtn-${p}" onclick="castVote('${p}')">${p}</button>
+  `).join('');
+
+  const dots = document.getElementById('svDots');
+  dots.innerHTML = svQueue.map((_,i) =>
+    `<div class="sv-dot ${i < svCurrentQ ? 'done' : ''}"></div>`
+  ).join('');
+}
+
+let svHasVoted = false;
+function castVote(name) {
+  if (svHasVoted) return;
+  svHasVoted = true;
+  svVotes[svCurrentQ][name]++;
+  document.querySelectorAll('.vote-btn').forEach(b => b.classList.remove('voted'));
+  document.getElementById(`vbtn-${name}`)?.classList.add('voted');
+  setTimeout(() => revealVote(), 600);
+}
+
+function revealVote() {
+  svHasVoted = false;
+  const votes = svVotes[svCurrentQ];
+  const winner = Object.entries(votes).sort((a,b)=>b[1]-a[1])[0];
+  const total = Object.values(votes).reduce((a,b)=>a+b,0);
+  const q = svQueue[svCurrentQ];
+
+  document.getElementById('svVoting').style.display = 'none';
+  document.getElementById('svReveal').style.display = 'flex';
+  document.getElementById('svRevealQ').textContent = `most likely to... ${q.q}`;
+  document.getElementById('svWinner').textContent = winner[0];
+  document.getElementById('svWinnerVotes').textContent = total > 0 ? `got ${winner[1]} out of ${total} votes` : 'no votes cast';
+
+  const maxVotes = Math.max(...Object.values(votes));
+  document.getElementById('svBars').innerHTML = players.map(p => `
+    <div class="sv-bar-row">
+      <div class="sv-bar-name">${p}</div>
+      <div class="sv-bar-track">
+        <div class="sv-bar-fill" style="width:${maxVotes > 0 ? (votes[p]/maxVotes)*100 : 0}%"></div>
+      </div>
+      <div class="sv-bar-count">${votes[p]}</div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('#svDots .sv-dot').forEach((d,i) => {
+    if (i <= svCurrentQ) d.classList.add('done');
+  });
+}
+
+function svNext() {
+  svCurrentQ++;
+  if (svCurrentQ >= svQueue.length) { quitToHome(); showToast('voting done! back to home 🗳️'); return; }
+  renderSvQuestion();
+}
+
+// ============ SPIN THE BOTTLE ============
+function startSpinSetup() {
+  if (players.length < 2) { showToast('add at least 2 players first!'); return; }
+  spQueue = buildQueue();
+  spCurrentQ = 0; spRound = 1; bottleAngle = 0; spinning = false;
+  renderSpinCircle();
+  showScreen('spin');
+  document.getElementById('spRound').textContent = 'round 1';
+}
+
+function renderSpinCircle() {
+  const circle = document.getElementById('spCircle');
+  const size = circle.offsetWidth || 300;
+  const cx = size/2, cy = size/2, r = size/2 - 38;
+  circle.querySelectorAll('.sp-player-dot').forEach(d => d.remove());
+  players.forEach((name, i) => {
+    const angle = (i/players.length)*2*Math.PI - Math.PI/2;
+    const x = cx + r*Math.cos(angle);
+    const y = cy + r*Math.sin(angle);
+    const dot = document.createElement('div');
+    dot.className = 'sp-player-dot';
+    dot.id = `spdot-${i}`;
+    dot.style.left = x+'px';
+    dot.style.top = y+'px';
+    dot.innerHTML = `<div class="sp-avatar">${name[0].toUpperCase()}</div><div class="sp-pname">${name}</div>`;
+    circle.appendChild(dot);
+  });
+}
+
+function spinBottle() {
+  if (spinning) return;
+  spinning = true;
+  document.getElementById('spBtn').disabled = true;
+  const winnerIdx = Math.floor(Math.random()*players.length);
+  const targetAngle = (winnerIdx/players.length)*360 - 90;
+  const extraSpins = (5+Math.floor(Math.random()*4))*360;
+  const finalAngle = bottleAngle + extraSpins + ((targetAngle - (bottleAngle % 360) + 360) % 360);
+  const duration = 3000 + Math.random()*1000;
+  const start = performance.now();
+  const startAngle = bottleAngle;
+  const bottle = document.getElementById('spBottle');
+
+  function animate(now) {
+    const progress = Math.min((now-start)/duration, 1);
+    const eased = 1 - Math.pow(1-progress, 3);
+    const current = startAngle + (finalAngle-startAngle)*eased;
+    bottle.style.transform = `rotate(${current}deg)`;
+    if (progress < 1) { requestAnimationFrame(animate); }
+    else {
+      bottleAngle = finalAngle;
+      spinning = false;
+      document.getElementById('spBtn').disabled = false;
+      setTimeout(() => showSpinWinner(winnerIdx), 300);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function showSpinWinner(idx) {
+  document.querySelectorAll('.sp-player-dot').forEach(d => d.classList.remove('winner'));
+  document.getElementById(`spdot-${idx}`)?.classList.add('winner');
+  const q = spQueue[spCurrentQ % spQueue.length];
+  const color = TYPE_COLORS[q.t] || '#e8ff47';
+  document.getElementById('spWinnerName').textContent = players[idx];
+  document.getElementById('spQType').textContent = TYPE_LABELS[q.t] || q.t;
+  document.getElementById('spQType').style.color = color;
+  document.getElementById('spQText').textContent = q.q;
+  document.getElementById('spQHint').textContent = q.h || '';
+  document.getElementById('spWinnerOverlay').classList.add('show');
+  spCurrentQ++;
+  spRound++;
+  document.getElementById('spRound').textContent = `round ${spRound}`;
+}
+
+function closeSpinWinner() {
+  document.getElementById('spWinnerOverlay').classList.remove('show');
+  document.querySelectorAll('.sp-player-dot').forEach(d => d.classList.remove('winner'));
+}
+
+// ============ UNLOCK ============
+function openUnlock() { document.getElementById('unlockModal').classList.add('open'); }
+function closeUnlock() { document.getElementById('unlockModal').classList.remove('open'); }
+function handleUnlock() {
+  showToast('payment coming soon! razorpay approval pending 🔜');
+  closeUnlock();
+  // Razorpay code goes here when ready
+}
+
+// ============ SCREENS ============
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============ PWA ============
+let deferredPrompt = null;
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').style.display = 'none';
+  showToast('No Cap installed! 🎮');
+});
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installBanner').style.display = 'none';
+    });
+  } else {
+    showToast('tap Share → Add to Home Screen on iPhone 📲');
+  }
+}
+function dismissInstall() {
+  document.getElementById('installBanner').style.display = 'none';
+  localStorage.setItem('installDismissed','1');
+}
+window.addEventListener('load', () => {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const dismissed = localStorage.getItem('installDismissed');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isMobile && !dismissed && !isStandalone) {
+    setTimeout(() => document.getElementById('installBanner').style.display = 'block', 3000);
+  }
+});
+</script>
+</body>
+</html>
