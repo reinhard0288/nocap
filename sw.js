@@ -1,28 +1,25 @@
-const CACHE = 'nocap-v1';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
+const CACHE = 'nocap-v3';
 
+// On install - cache nothing, just activate immediately
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS))
-  );
   self.skipWaiting();
 });
 
+// On activate - delete ALL old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+      Promise.all(keys.map(key => {
+        console.log('deleting cache:', key);
+        return caches.delete(key);
+      }))
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+// Never serve from cache - always fetch fresh from network
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });
