@@ -13,6 +13,14 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G49KQE6F10"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-G49KQE6F10');
+</script>
 <style>
 /* ============ RESET & BASE ============ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -845,6 +853,7 @@ function startGame() {
   queue = buildQueue();
   currentQ = 0; currentPlayer = 0; skips = 0;
   players.forEach(p => scores[p] = 0);
+  gtag('event', 'start_game', { modes: selectedModes.join(','), players: players.length });
   showScreen('game');
   renderQ();
 }
@@ -924,6 +933,7 @@ function showScoreboard() {
 // ============ RAPID FIRE ============
 function startRapidFire() {
   if (players.length < 2) { showToast('add at least 2 players first!'); return; }
+  gtag('event', 'start_rapid_fire', { players: players.length });
   rfQueue = [...RF_Q].sort(() => Math.random()-0.5);
   rfCurrentQ = 0; rfAnswered = 0;
 
@@ -1007,6 +1017,7 @@ function endRapidFire() { clearInterval(rfTimer); quitToHome(); }
 // ============ SECRET VOTE ============
 function startSecretVote() {
   if (players.length < 2) { showToast('add at least 2 players first!'); return; }
+  gtag('event', 'start_secret_vote', { players: players.length });
   svQueue = [...SV_Q].sort(() => Math.random()-0.5).slice(0,5);
   svCurrentQ = 0; svVotes = {};
 
@@ -1083,6 +1094,7 @@ function svNext() {
 // ============ SPIN THE BOTTLE ============
 function startSpinSetup() {
   if (players.length < 2) { showToast('add at least 2 players first!'); return; }
+  gtag('event', 'start_spin_bottle', { players: players.length });
   spQueue = buildQueue();
   spCurrentQ = 0; spRound = 1; bottleAngle = 0; spinning = false;
   renderSpinCircle();
@@ -1160,7 +1172,10 @@ function closeSpinWinner() {
 }
 
 // ============ UNLOCK ============
-function openUnlock() { document.getElementById('unlockModal').classList.add('open'); }
+function openUnlock() {
+  gtag('event', 'unlock_modal_open');
+  document.getElementById('unlockModal').classList.add('open');
+}
 function closeUnlock() { document.getElementById('unlockModal').classList.remove('open'); }
 function handleUnlock() {
   showToast('payment coming soon! razorpay approval pending 🔜');
